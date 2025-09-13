@@ -1,17 +1,29 @@
 package com.example.controller;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
-import com.example.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.model.User;
+import com.example.repository.UserRepository;
+
 import jakarta.servlet.http.HttpSession;
-import java.util.*;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
+    
+    @Autowired
+    private UserRepository userRepository;
     
     /**
      * Mostrar formulario de login
@@ -71,10 +83,11 @@ public class AuthController {
         }
         
         try {
-            // Verificar credenciales usando el modelo User
-            User user = verifyCredentials(email.trim(), password, userType);
+            // Verificar credenciales usando el repositorio
+            Optional<User> userOpt = userRepository.findByEmailAndPasswordAndRol(email.trim(), password, userType);
             
-            if (user != null) {
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
                 // Usuario encontrado, guardar datos en sesión
                 session.setAttribute("user_id", user.getId());
                 session.setAttribute("email", email.trim());
@@ -178,18 +191,21 @@ public class AuthController {
         }
         
         try {
-            // Simular verificación de email existente
-            if (emailExists(email)) {
+            // Verificar si el email ya existe
+            if (userRepository.existsByEmail(email.trim())) {
                 redirectAttributes.addFlashAttribute("error", "El email ya está registrado.");
                 return "redirect:/auth/register";
             }
             
-            // Simular creación de usuario (en una aplicación real, esto iría a la base de datos)
-            Long userId = createUser(nombre, apellido, email, password, userType, 
-                telefono, direccion, preferencias_contacto, especialidades, 
-                experiencia, tarifa_hora, certificaciones, descripcion);
+            // Crear nuevo usuario
+            User newUser = new User(nombre.trim(), apellido.trim(), email.trim(), password, userType);
+            newUser.setTelefono(telefono != null ? telefono.trim() : "");
+            newUser.setDireccion(direccion != null ? direccion.trim() : "");
             
-            if (userId != null) {
+            // Guardar usuario en la base de datos
+            User savedUser = userRepository.save(newUser);
+            
+            if (savedUser != null && savedUser.getId() != null) {
                 redirectAttributes.addFlashAttribute("success", 
                     "Registro exitoso. ¡Ya puedes iniciar sesión!");
                 return "redirect:/auth/login";
@@ -260,52 +276,13 @@ public class AuthController {
         }
     }
     
-    /**
-     * Verificar credenciales (simulado)
-     */
-    private User verifyCredentials(String email, String password, String userType) {
-        // Simulación de verificación de credenciales
-        // En una aplicación real, esto consultaría la base de datos
-        
-        if ("admin@sunobra.com".equals(email) && "admin".equals(password) && "admin".equals(userType)) {
-            return new User(1L, "Admin", "Sistema", "admin@sunobra.com", "admin");
-        } else if ("cliente@sunobra.com".equals(email) && "cliente".equals(password) && "cliente".equals(userType)) {
-            return new User(2L, "Juan", "Pérez", "cliente@sunobra.com", "cliente");
-        } else if ("obrero@sunobra.com".equals(email) && "obrero".equals(password) && "obrero".equals(userType)) {
-            return new User(3L, "Carlos", "García", "obrero@sunobra.com", "obrero");
-        }
-        
-        return null;
-    }
-    
-    /**
-     * Verificar si el email ya existe (simulado)
-     */
-    private boolean emailExists(String email) {
-        // Simulación - en una aplicación real consultaría la base de datos
-        return Arrays.asList("admin@sunobra.com", "cliente@sunobra.com", "obrero@sunobra.com")
-                .contains(email);
-    }
-    
-    /**
-     * Crear usuario (simulado)
-     */
-    private Long createUser(String nombre, String apellido, String email, String password,
-                           String userType, String telefono, String direccion, 
-                           String preferencias_contacto, String[] especialidades,
-                           Integer experiencia, Double tarifa_hora, String certificaciones,
-                           String descripcion) {
-        // Simulación de creación de usuario
-        // En una aplicación real, esto insertaría en la base de datos
-        return System.currentTimeMillis(); // ID simulado
-    }
     
     /**
      * Validar datos de registro
      */
     private List<String> validateRegistration(String nombre, String apellido, String email,
                                             String password, String confirmPassword, String userType,
-                                            String[] especialidades, Integer experiencia, Double tarifa_hora) {
+                                            String[] especialidades, Integer experiencia, Double tarifaHora) {
         List<String> errors = new ArrayList<>();
         
         if (nombre == null || nombre.trim().isEmpty()) {
@@ -348,7 +325,7 @@ public class AuthController {
                 errors.add("Los años de experiencia deben ser un número válido.");
             }
             
-            if (tarifa_hora != null && (tarifa_hora < 0)) {
+            if (tarifaHora != null && (tarifaHora < 0)) {
                 errors.add("La tarifa por hora debe ser un número válido.");
             }
         }
