@@ -1,4 +1,4 @@
-package com.example;
+package com.example.controller;
 
 import com.example.model.User;
 import org.springframework.stereotype.Controller;
@@ -116,7 +116,7 @@ public class AuthController {
      */
     @GetMapping("/register")
     public String showRegister(@RequestParam(required = false) String type, 
-                              Model model, HttpSession session) {
+                          Model model, HttpSession session) {
         // Verificar si ya está autenticado
         if (isAuthenticated(session)) {
             return redirectToDashboard(session);
