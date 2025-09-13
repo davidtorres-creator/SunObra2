@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">SunObra - Plataforma de Servicios de Construcción</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/home.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <!-- Left Navigation -->
+        <div class="navbar-nav me-auto">
+            <a class="nav-link" href="#inicio">Inicio</a>
+            <a class="nav-link" href="#nosotros">Nosotros</a>
+            <a class="nav-link" href="#proyectos">Proyectos</a>
+        </div>
+        
+        <!-- Center Logo -->
+        <div class="navbar-brand mx-auto d-flex align-items-center">
+            <div class="logo-icon me-2">
+                <i class="fas fa-building" style="color: #ffb300; font-size: 1.5rem;"></i>
+            </div>
+            <span class="fw-bold">SUNOBRA</span>
+        </div>
+        
+        <!-- Right Navigation -->
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="#redes">Redes</a>
+            <a class="nav-link" href="#testimonios">Testimonios</a>
+            <a class="nav-link" href="#contacto">Contacto</a>
+            <a class="btn btn-primary ms-2" href="/login">Iniciar sesión</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="worker-hero">
+    <div class="container worker-hero-content">
+        <h1 class="worker-hero-title hero-animate animate-fade-in-up">S U N O B R A</h1>
+        <h2 class="worker-hero-subtitle animate-fade-in-up animate-delay-1">Construye tu futuro con tus manos</h2>
+        <a class="worker-hero-btn btn-hover animate-fade-in-up animate-delay-2" href="#proyectos">Avancemos juntos</a>
+    </div>
+</section>
+
+<!-- Nosotros Section -->
+<section id="nosotros" class="py-5 worker-section-bg text-center">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="/images/about-section.jpg" 
+                     alt="Nosotros" 
+                     class="img-fluid rounded worker-card animate-fade-in-up animate-delay-1"
+                     loading="lazy"
+                     onerror="this.src='https://via.placeholder.com/600x400/667eea/ffffff?text=SunObra'">
+            </div>
+            <div class="col-lg-6 animate-fade-in-up animate-delay-2">
+                <div class="worker-badge mb-2 badge-animate">¿Quiénes somos?</div>
+                <h2 class="mb-4 worker-section-title">Nosotros</h2>
+                <p class="lead">Somos un equipo comprometido con el desarrollo de soluciones tecnológicas orientadas a optimizar el proceso de contratación de servicios de albañilería...</p>
+                <p>Creemos en el poder de la tecnología como un puente que permite facilitar el acceso a oportunidades laborales para la clase obrera, al mismo tiempo que ofrecemos a los usuarios una forma práctica y confiable de encontrar prestadores de servicios calificados.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Proyectos Section -->
+<section id="proyectos" class="py-5 text-center worker-section-bg">
+    <div class="container">
+        <h2 class="worker-section-title animate-fade-in-up">Proyectos</h2>
+        <div class="row g-4 justify-content-center">
+            <div th:each="project, iterStat : ${projects}" class="col-sm-6 col-lg-3">
+                <div class="card h-100 worker-card service-card-animate card-hover animate-fade-in-up animate-delay-1">
+                    <img th:src="${project.imageUrl}" 
+                         class="card-img-top" 
+                         th:alt="${project.title}"
+                         loading="lazy"
+                         onerror="this.src='https://via.placeholder.com/300x200/667eea/ffffff?text=Proyecto'">
+                    <div class="card-body">
+                        <div class="worker-badge mb-2 badge-animate" th:text="${project.category}"></div>
+                        <h5 class="card-title" th:text="${project.title}"></h5>
+                        <p class="card-text" th:text="${project.description}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Redes Sociales Section -->
+<section id="redes" class="py-5 bg-white text-center">
+    <div class="container">
+        <h2 class="text-center mb-5 text-primary">Redes Sociales</h2>
+        <div class="row g-4 justify-content-center">
+            <div th:each="member : ${teamMembers}" class="col-md-4">
+                <div class="card h-100 text-center">
+                    <img th:src="${member.imageUrl}" 
+                         th:alt="${member.name}" 
+                         class="card-img-top"
+                         loading="lazy">
+                    <div class="card-body">
+                        <h4 class="mb-2" th:text="${member.name}"></h4>
+                        <p th:text="${member.description}"></p>
+                        <div th:if="${member.facebookUrl != null}">
+                            <a th:href="${member.facebookUrl}" class="btn btn-outline-primary btn-sm">Facebook</a>
+                        </div>
+                        <div th:if="${member.twitterUrl != null}">
+                            <a th:href="${member.twitterUrl}" class="btn btn-outline-info btn-sm ms-2">Twitter</a>
+                        </div>
+                        <div th:if="${member.instagramUrl != null}">
+                            <a th:href="${member.instagramUrl}" class="btn btn-outline-primary btn-sm">Instagram</a>
+                        </div>
+                        <div th:if="${member.linkedinUrl != null}">
+                            <a th:href="${member.linkedinUrl}" class="btn btn-outline-info btn-sm ms-2">LinkedIn</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonios Section -->
+<section id="testimonios" class="py-5 worker-section-bg text-center">
+    <div class="container">
+        <h2 class="worker-section-title">Testimonios</h2>
+        <div class="row g-4 justify-content-center">
+            <div th:each="testimonial : ${testimonials}" class="col-md-4">
+                <div class="card p-4 h-100 worker-card">
+                    <div class="worker-badge mb-2" th:text="${testimonial.role}"></div>
+                    <h5 class="mb-1 text-primary" th:text="${testimonial.name}"></h5>
+                    <p class="mb-0" th:text="${testimonial.content}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contacto Section -->
+<section id="contacto" class="py-5 bg-white text-center">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-md-6">
+                <div id="map" style="width: 100%; height: 350px; border-radius: 10px; overflow: hidden;"></div>
+            </div>
+            <div class="col-md-6">
+                <h3 class="mb-3 text-primary">Estamos ubicados</h3>
+                <p class="mb-4">¿Tienes dudas o quieres visitarnos? ¡Contáctanos o ven a nuestras oficinas!</p>
+                <div class="text-muted mb-2"><i class="fas fa-map-marker-alt me-2"></i> <span th:text="${settings.contactAddress}">Bogotá Colombia</span></div>
+                <div class="text-muted mb-2"><i class="fas fa-phone me-2"></i> <span th:text="${settings.contactPhone}">3138385779</span></div>
+                <div class="text-muted"><i class="fas fa-envelope me-2"></i> <span th:text="${settings.contactEmail}">sunobra69@gmail.com</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Scripts de terceros -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js" defer></script>
+
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtme10pzgKSPeJVJrG1O3tjR6lk98o4w8&callback=initMap" async defer></script>
+
+<script>
+// Initialize Google Maps
+function initMap() {
+    const bogota = { lat: 4.6097, lng: -74.0817 };
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 12,
+        center: bogota,
+    });
+    const marker = new google.maps.Marker({
+        position: bogota,
+        map: map,
+        title: "SunObra - Bogotá, Colombia"
+    });
+}
+</script>
+
+</body>
+</html>
