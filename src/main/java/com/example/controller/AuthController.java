@@ -1,178 +1,25 @@
 package com.example.controller;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
-<<<<<<< HEAD
 import com.example.model.usuarios;
 import com.example.service.UsuarioService;
-=======
->>>>>>> 9afebe2d4ab7b8208953e61c1598d3d0d835c896
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.model.User;
-import com.example.repository.UserRepository;
-
 import jakarta.servlet.http.HttpSession;
+import java.util.*;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
     
     @Autowired
-<<<<<<< HEAD
     private UsuarioService usuarioService;
     
     /**
      * Procesar registro - MÉTODO CORREGIDO
-=======
-    private UserRepository userRepository;
-    
-    /**
-     * Mostrar formulario de login
-     */
-    @GetMapping("/login")
-    public String showLogin(Model model, HttpSession session) {
-        // Verificar si ya está autenticado
-        if (isAuthenticated(session)) {
-            return redirectToDashboard(session);
-        }
-        
-        // Obtener mensajes de la sesión
-        String error = (String) session.getAttribute("auth_error");
-        String success = (String) session.getAttribute("auth_success");
-        
-        if (error != null) {
-            model.addAttribute("error", error);
-            session.removeAttribute("auth_error");
-        }
-        
-        if (success != null) {
-            model.addAttribute("success", success);
-            session.removeAttribute("auth_success");
-        }
-        
-        return "auth/login";
-    }
-    
-    /**
-     * Procesar login
-     */
-    @PostMapping("/login")
-    public String login(@RequestParam String userType,
-                       @RequestParam String email,
-                       @RequestParam String password,
-                       HttpSession session,
-                       RedirectAttributes redirectAttributes) {
-        
-        // Validaciones básicas
-        if (email == null || email.trim().isEmpty() || 
-            password == null || password.isEmpty() || 
-            userType == null || userType.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Por favor, complete todos los campos.");
-            return "redirect:/auth/login";
-        }
-        
-        // Validar formato de email
-        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            redirectAttributes.addFlashAttribute("error", "El formato del email no es válido.");
-            return "redirect:/auth/login";
-        }
-        
-        // Validar tipo de usuario
-        if (!Arrays.asList("obrero", "cliente", "admin").contains(userType)) {
-            redirectAttributes.addFlashAttribute("error", "Tipo de usuario no válido.");
-            return "redirect:/auth/login";
-        }
-        
-        try {
-            // Verificar credenciales usando el repositorio
-            Optional<User> userOpt = userRepository.findByEmailAndPasswordAndRol(email.trim(), password, userType);
-            
-            if (userOpt.isPresent()) {
-                User user = userOpt.get();
-                // Usuario encontrado, guardar datos en sesión
-                session.setAttribute("user_id", user.getId());
-                session.setAttribute("email", email.trim());
-                session.setAttribute("user_role", userType);
-                session.setAttribute("nombre", user.getNombre());
-                session.setAttribute("apellido", user.getApellido());
-                
-                // Redirigir según el tipo de usuario
-                switch (userType) {
-                    case "cliente":
-                        session.setAttribute("cliente_id", user.getId());
-                        return "redirect:/cliente/dashboard";
-                    case "obrero":
-                        session.setAttribute("obrero_id", user.getId());
-                        return "redirect:/obrero/dashboard";
-                    case "admin":
-                        session.setAttribute("admin_id", user.getId());
-                        return "redirect:/admin/dashboard";
-                    default:
-                        return "redirect:/dashboard";
-                }
-            } else {
-                // Usuario no encontrado
-                redirectAttributes.addFlashAttribute("error", 
-                    "Correo electrónico, contraseña o tipo de usuario incorrectos.");
-                return "redirect:/auth/login";
-            }
-            
-        } catch (Exception e) {
-            System.err.println("Error en login: " + e.getMessage());
-            redirectAttributes.addFlashAttribute("error", 
-                "Error interno del sistema. Por favor, intente más tarde.");
-            return "redirect:/auth/login";
-        }
-    }
-    
-    /**
-     * Mostrar formulario de registro
-     */
-    @GetMapping("/register")
-    public String showRegister(@RequestParam(required = false) String type, 
-                          Model model, HttpSession session) {
-        // Verificar si ya está autenticado
-        if (isAuthenticated(session)) {
-            return redirectToDashboard(session);
-        }
-        
-        // Validar el tipo de usuario
-        String userType = type;
-        if (userType != null && !Arrays.asList("obrero", "cliente").contains(userType)) {
-            userType = "";
-        }
-        
-        // Obtener mensajes de la sesión
-        String error = (String) session.getAttribute("auth_error");
-        String success = (String) session.getAttribute("auth_success");
-        
-        if (error != null) {
-            model.addAttribute("error", error);
-            session.removeAttribute("auth_error");
-        }
-        
-        if (success != null) {
-            model.addAttribute("success", success);
-            session.removeAttribute("auth_success");
-        }
-        
-        model.addAttribute("userType", userType);
-        return "auth/register";
-    }
-    
-    /**
-     * Procesar registro
->>>>>>> 9afebe2d4ab7b8208953e61c1598d3d0d835c896
      */
     @PostMapping("/register")
     public String register(@RequestParam String nombre,
@@ -202,7 +49,6 @@ public class AuthController {
         }
         
         try {
-<<<<<<< HEAD
             // Crear objeto usuario
             usuarios nuevoUsuario = new usuarios();
             nuevoUsuario.setNombre(nombre.trim());
@@ -234,31 +80,6 @@ public class AuthController {
             redirectAttributes.addFlashAttribute("success", 
                 "Registro exitoso. ¡Ya puedes iniciar sesión!");
             return "redirect:/auth/login";
-=======
-            // Verificar si el email ya existe
-            if (userRepository.existsByEmail(email.trim())) {
-                redirectAttributes.addFlashAttribute("error", "El email ya está registrado.");
-                return "redirect:/auth/register";
-            }
-            
-            // Crear nuevo usuario
-            User newUser = new User(nombre.trim(), apellido.trim(), email.trim(), password, userType);
-            newUser.setTelefono(telefono != null ? telefono.trim() : "");
-            newUser.setDireccion(direccion != null ? direccion.trim() : "");
-            
-            // Guardar usuario en la base de datos
-            User savedUser = userRepository.save(newUser);
-            
-            if (savedUser != null && savedUser.getId() != null) {
-                redirectAttributes.addFlashAttribute("success", 
-                    "Registro exitoso. ¡Ya puedes iniciar sesión!");
-                return "redirect:/auth/login";
-            } else {
-                redirectAttributes.addFlashAttribute("error", 
-                    "Error al crear la cuenta. Por favor, intente nuevamente.");
-                return "redirect:/auth/register";
-            }
->>>>>>> 9afebe2d4ab7b8208953e61c1598d3d0d835c896
             
         } catch (Exception e) {
             System.err.println("Error en registro: " + e.getMessage());
@@ -375,17 +196,14 @@ public class AuthController {
         }
     }
     
-<<<<<<< HEAD
     // ... resto de métodos (showLogin, showRegister, logout, etc.) se mantienen igual
-=======
->>>>>>> 9afebe2d4ab7b8208953e61c1598d3d0d835c896
     
     /**
      * Validar datos de registro
      */
     private List<String> validateRegistration(String nombre, String apellido, String email,
                                             String password, String confirmPassword, String userType,
-                                            String[] especialidades, Integer experiencia, Double tarifaHora) {
+                                            String[] especialidades, Integer experiencia, Double tarifa_hora) {
         List<String> errors = new ArrayList<>();
         
         if (nombre == null || nombre.trim().isEmpty()) {
@@ -428,7 +246,7 @@ public class AuthController {
                 errors.add("Los años de experiencia deben ser un número válido.");
             }
             
-            if (tarifaHora != null && (tarifaHora < 0)) {
+            if (tarifa_hora != null && (tarifa_hora < 0)) {
                 errors.add("La tarifa por hora debe ser un número válido.");
             }
         }
