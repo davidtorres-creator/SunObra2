@@ -1,4 +1,4 @@
-                                                                               <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +8,7 @@
 <body class="p-4">
 <div class="container">
     <h2 th:text="${isEdit} ? 'Editar Usuario' : 'Nuevo Usuario'"></h2>
-    <form th:action="${isEdit} ? @{'/admin/users/' + ${usuario.id}} : @{'/admin/users'}" method="post">
+    <form th:action="${isEdit} ? @{/admin/users/{id}(id=${usuario.id})} : @{/admin/users}" method="post">
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label">Nombre</label>
@@ -24,7 +24,9 @@
             </div>
             <div class="col-md-6">
                 <label class="form-label">Contraseña</label>
-                <input class="form-control" type="password" name="password" th:placeholder="${isEdit} ? 'Dejar en blanco para no cambiar' : ''}" th:required="${!isEdit}">
+                <input class="form-control" type="password" name="password"
+                       th:placeholder="${isEdit} ? 'Dejar en blanco para no cambiar' : ''"
+                       th:required="${!isEdit}">
             </div>
             <div class="col-md-6">
                 <label class="form-label">Rol</label>
@@ -40,9 +42,6 @@
             <a class="btn btn-secondary" href="/admin/users">Cancelar</a>
         </div>
     </form>
-}
 </div>
 </body>
 </html>
-
-
