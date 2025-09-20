@@ -22,7 +22,7 @@ public class HomeController {
     @GetMapping
     public String index(Model model, HttpSession session) {
         // Obtener usuario actual de la sesión
-        User user = getCurrentUser(session);
+        usuarios user = getCurrentUser(session);
         
         // Configuración del sistema (equivalente a getSystemSettings() del PHP)
         Settings settings = Settings.getDefaultSettings();
@@ -93,7 +93,7 @@ public class HomeController {
      */
     @GetMapping("/welcome")
     public String welcome(Model model, HttpSession session) {
-        User user = getCurrentUser(session);
+        usuarios user = getCurrentUser(session);
         
         model.addAttribute("title", "Bienvenido a SunObra");
         model.addAttribute("user", user);
@@ -108,7 +108,7 @@ public class HomeController {
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session) {
         if (!isAuthenticated(session)) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
         
         return redirectToDashboard(session);
@@ -181,9 +181,9 @@ public class HomeController {
             case "auth":
                 switch (action) {
                     case "login":
-                        return "redirect:/login";
+                        return "redirect:/auth/login";
                     case "register":
-                        return "redirect:/register";
+                        return "redirect:/auth/register";
                     case "logout":
                         return "redirect:/logout";
                     default:
@@ -200,7 +200,7 @@ public class HomeController {
                             return "redirect:/admin/dashboard";
                     }
                 } else {
-                    return "redirect:/login";
+                    return "redirect:/auth/login";
                 }
             case "cliente":
                 if (isAuthenticated(session) && "cliente".equals(session.getAttribute("user_role"))) {
@@ -213,7 +213,7 @@ public class HomeController {
                             return "redirect:/cliente/dashboard";
                     }
                 } else {
-                    return "redirect:/login";
+                    return "redirect:/auth/login";
                 }
             case "obrero":
                 if (isAuthenticated(session) && "obrero".equals(session.getAttribute("user_role"))) {
@@ -237,18 +237,18 @@ public class HomeController {
      * Obtiene el usuario actual de la sesión
      * Equivalente al método getCurrentUser() del IndexController PHP
      */
-    private User getCurrentUser(HttpSession session) {
+    private usuarios getCurrentUser(HttpSession session) {
         Long userId = (Long) session.getAttribute("user_id");
         if (userId != null) {
             // En una aplicación real, esto vendría de la base de datos
             // Por ahora, retornamos un usuario de ejemplo basado en el rol
             String role = (String) session.getAttribute("user_role");
             if ("admin".equals(role)) {
-                return User.getSampleAdminUser();
+                return usuarios.getSampleAdminUser();
             } else if ("obrero".equals(role)) {
-                return User.getSampleObreroUser();
+                return usuarios.getSampleAdminUser();
             } else {
-                return User.getSampleUser();
+                return usuarios.getSampleAdminUser();
             }
         }
         return null;
@@ -267,6 +267,7 @@ public class HomeController {
      * Equivalente al método getSystemSettings() del controlador PHP
      * @deprecated Usar Settings.getDefaultSettings() en su lugar
      */
+    @SuppressWarnings("unused")
     @Deprecated
     private Map<String, String> getSystemSettings() {
         Map<String, String> settings = new HashMap<>();
