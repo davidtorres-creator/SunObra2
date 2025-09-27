@@ -1,0 +1,153 @@
+/* ===== Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 30px;
+  color: #000;
+}
+
+/* ===== Contenedor ===== */
+.container {
+  max-width: 1100px;
+  margin: auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgb(255, 123, 0);
+}
+
+/* ===== Header ===== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.header h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ff7b00;
+}
+
+/* ===== Formulario de filtros ===== */
+.filter-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.filter-form select,
+.filter-form input {
+  padding: 8px 62px;
+  border-radius: 6px;
+  border: 1px solid #ffbb00;
+  font-size: 0.9rem;
+  outline: none;
+  transition: 0.2s;
+}
+.filter-form select:focus,
+.filter-form input:focus {
+  border-color: #ff9100;
+  box-shadow: 0 0 0 3px rgba(255, 145, 0, 0);
+}
+/* Custom select */
+.filter-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: #ffffff url("data:image/svg+xml;utf8,<svg fill='black' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 12px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+.filter-form option[value=""] {
+  font-weight: bold;
+  color: #ff6600;
+}
+
+/* ===== Tabla ===== */
+.tabla-usuarios {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.tabla-usuarios thead {
+  background: #ff9100;
+  color: #fff;
+}
+.tabla-usuarios th,
+.tabla-usuarios td {
+  padding: 12px 15px;
+  text-align: left;
+}
+.tabla-usuarios tr:nth-child(even) {
+  background: #f1f1f1;
+}
+.tabla-usuarios tr:hover {
+  background: #ff73007c;
+}
+
+/* ===== Botones ===== */
+.btn {
+  display: inline-block;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: 0.3s;
+}
+
+/* Colores de botones */
+.btn-primary {
+  background: #ff9900;
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #ff6600;
+}
+
+.btn-secondary {
+  background: #000000;
+  color: #fff;
+}
+.btn-secondary:hover {
+  background: #ff6c0a;
+}
+
+.btn-outline-primary {
+  background: #fff;
+  border: 2px solid #2196f3;
+  color: #2196f3;
+}
+.btn-outline-primary:hover {
+  background: #2196f3;
+  color: #fff;
+}
+
+.btn-outline-danger {
+  background: #fff;
+  border: 2px solid #e53935;
+  color: #e53935;
+}
+.btn-outline-danger:hover {
+  background: #e53935;
+  color: #fff;
+}
+
+.btn-back {
+  background: #000000;
+  color: #fff;
+}
+.btn-back:hover {
+  background: #222;
+}

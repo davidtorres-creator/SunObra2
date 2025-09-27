@@ -1,31 +1,47 @@
-                              <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Admin - Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/dashboardadmin.css" rel="stylesheet">
 </head>
-<body class="p-4">
-<div class="container">
-    <h1 class="mb-4">Panel de Administración</h1>
-    <div class="row g-3">
-        <div class="col-md-4">
-            <div class="card text-bg-primary">
-                <div class="card-body">
-                    <h5>Total Usuarios</h5>
-                    <div class="display-6" th:text="${totalUsuarios}">0</div>
-                </div>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a class="navbar-brand" href="#">SunObra - Admin</a>
+            <ul class="navbar-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/admin/users">Usuarios</a></li>
+                <li><a href="/admin/reports">Reportes</a></li>
+            </ul>
+            <a class="btn-logout" href="/logout">Cerrar sesión</a>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO -->
+    <div class="container">
+        <h1 class="title">Panel de Administración</h1>
+        <div class="cards">
+            <!-- Card Usuarios -->
+            <div class="card card-blue">
+                <h5>Total Usuarios</h5>
+                <div class="card-value" th:text="${totalUsuarios}">0</div>
+                <a href="/admin/users" class="btn-card">Gestionar</a>
+            </div>
+            
+            <!-- Card Contratos -->
+            <div class="card card-yellow">
+                <h5>Reportes Avanzados</h5>
+                <div class="card-value" th:text="${contratosActivos}">0</div>
+                <a href="/admin/reports" class="btn-card dark">Ver</a>
             </div>
         </div>
     </div>
 
-    <div class="mt-4 d-flex gap-2">
-        <a class="btn btn-secondary" href="/">Inicio</a>
-        <a class="btn btn-outline-primary" href="/admin/users">Gestionar Usuarios</a>
-        <a class="btn btn-outline-success" href="/admin/reports">Reportes Avanzados</a>
-    </div>
-</div>
+    <!-- FOOTER -->
+    <footer class="footer">
+        © 2025 SunObra - Plataforma de Servicios de Construcción
+    </footer>
 </body>
 </html>
-
-
