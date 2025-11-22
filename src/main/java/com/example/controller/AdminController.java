@@ -1,8 +1,8 @@
-                           package com.example.controller;
+package com.example.controller;
 
 import com.example.model.usuarios;
 import com.example.service.UsuarioService;
-import com.example.service.DocumentService;
+import com.example.service.ReportService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -21,15 +21,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador para las funcionalidades administrativas.
+ *
+ * <p>Incluye operaciones de CRUD para usuarios y la generación de reportes
+ * en distintos formatos. Este controlador utiliza {@link ReportService}
+ * para delegar la generación de reportes, aplicando así el patrón de
+ * estrategia en la capa de servicio.</p>
+ */
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
     @Autowired
     private UsuarioService usuarioService;
-    
+
     @Autowired
-    private DocumentService documentService;
+    private ReportService reportService;
 
     private boolean hasRole(HttpSession session, String role) {
         Object r = session.getAttribute("user_role");
@@ -41,12 +49,10 @@ public class AdminController {
         System.out.println("=== ADMIN DASHBOARD ===");
         System.out.println("Session user_id: " + session.getAttribute("user_id"));
         System.out.println("Session user_role: " + session.getAttribute("user_role"));
-        
         if (!hasRole(session, "admin")) {
             System.out.println("ERROR: Usuario no tiene rol de admin");
             return "redirect:/auth/login";
         }
-        
         model.addAttribute("title", "Panel de Administración");
         model.addAttribute("totalUsuarios", usuarioService.listarUsuarios().size());
         model.addAttribute("fecha", LocalDateTime.now());
@@ -64,15 +70,17 @@ public class AdminController {
         }
         List<usuarios> data = new ArrayList<>(usuarioService.listarUsuarios());
         if (role != null && !role.isBlank()) {
-            data = data.stream().filter(u -> role.equalsIgnoreCase(u.getUserType())).collect(Collectors.toList());
+            data = data.stream()
+                    .filter(u -> role.equalsIgnoreCase(u.getUserType()))
+                    .collect(Collectors.toList());
         }
         if (q != null && !q.isBlank()) {
             String term = q.toLowerCase();
-            data = data.stream().filter(u ->
-                (u.getNombre() != null && u.getNombre().toLowerCase().contains(term)) ||
-                (u.getApellido() != null && u.getApellido().toLowerCase().contains(term)) ||
-                (u.getEmail() != null && u.getEmail().toLowerCase().contains(term))
-            ).collect(Collectors.toList());
+            data = data.stream()
+                    .filter(u -> (u.getNombre() != null && u.getNombre().toLowerCase().contains(term)) ||
+                            (u.getApellido() != null && u.getApellido().toLowerCase().contains(term)) ||
+                            (u.getEmail() != null && u.getEmail().toLowerCase().contains(term)))
+                    .collect(Collectors.toList());
         }
         model.addAttribute("title", "Usuarios");
         model.addAttribute("usuarios", data);
@@ -92,7 +100,8 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    public String createUser(HttpSession session, @ModelAttribute("usuario") usuarios user, BindingResult result) {
+    public String createUser(HttpSession session, @ModelAttribute("usuario") usuarios user,
+                             BindingResult result) {
         if (!hasRole(session, "admin")) {
             return "redirect:/auth/login";
         }
@@ -129,7 +138,8 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}")
-    public String updateUser(HttpSession session, @PathVariable Long id, @ModelAttribute("usuario") usuarios user, BindingResult result) {
+    public String updateUser(HttpSession session, @PathVariable Long id,
+                             @ModelAttribute("usuario") usuarios user, BindingResult result) {
         if (!hasRole(session, "admin")) {
             return "redirect:/auth/login";
         }
@@ -158,18 +168,23 @@ public class AdminController {
         }
         List<usuarios> data = new ArrayList<>(usuarioService.listarUsuarios());
         if (role != null && !role.isBlank()) {
-            data = data.stream().filter(u -> role.equalsIgnoreCase(u.getUserType())).collect(Collectors.toList());
+            data = data.stream()
+                    .filter(u -> role.equalsIgnoreCase(u.getUserType()))
+                    .collect(Collectors.toList());
         }
         if (especialidad != null && !especialidad.isBlank()) {
-            data = data.stream().filter(u -> u.getEspecialidades() != null && u.getEspecialidades().toLowerCase().contains(especialidad.toLowerCase())).collect(Collectors.toList());
+            data = data.stream()
+                    .filter(u -> u.getEspecialidades() != null &&
+                            u.getEspecialidades().toLowerCase().contains(especialidad.toLowerCase()))
+                    .collect(Collectors.toList());
         }
         if (texto != null && !texto.isBlank()) {
             String t = texto.toLowerCase();
-            data = data.stream().filter(u ->
-                (u.getNombre() != null && u.getNombre().toLowerCase().contains(t)) ||
-                (u.getApellido() != null && u.getApellido().toLowerCase().contains(t)) ||
-                (u.getEmail() != null && u.getEmail().toLowerCase().contains(t))
-            ).collect(Collectors.toList());
+            data = data.stream()
+                    .filter(u -> (u.getNombre() != null && u.getNombre().toLowerCase().contains(t)) ||
+                            (u.getApellido() != null && u.getApellido().toLowerCase().contains(t)) ||
+                            (u.getEmail() != null && u.getEmail().toLowerCase().contains(t)))
+                    .collect(Collectors.toList());
         }
         model.addAttribute("title", "Reportes");
         model.addAttribute("usuarios", data);
@@ -182,24 +197,22 @@ public class AdminController {
     // Endpoints para generar reportes en diferentes formatos
     @GetMapping("/reports/export/html")
     public ResponseEntity<ByteArrayResource> exportHtml(HttpSession session,
-                                                       @RequestParam(required = false) String role,
-                                                       @RequestParam(required = false) String especialidad,
-                                                       @RequestParam(required = false) String texto) {
+                                                        @RequestParam(required = false) String role,
+                                                        @RequestParam(required = false) String especialidad,
+                                                        @RequestParam(required = false) String texto) {
         if (!hasRole(session, "admin")) {
             return ResponseEntity.status(403).build();
         }
-        
         try {
             List<usuarios> data = getFilteredUsers(role, especialidad, texto);
-            String title = "Reporte de Usuarios - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            
-            byte[] htmlBytes = documentService.generateHtmlReport(data, title);
-            ByteArrayResource resource = new ByteArrayResource(htmlBytes);
-            
+            String title = "Reporte de Usuarios - " +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            byte[] report = reportService.generateReport(data, title, "html");
+            ByteArrayResource resource = new ByteArrayResource(report);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_usuarios.html")
                     .contentType(MediaType.TEXT_HTML)
-                    .contentLength(htmlBytes.length)
+                    .contentLength(report.length)
                     .body(resource);
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
@@ -214,18 +227,16 @@ public class AdminController {
         if (!hasRole(session, "admin")) {
             return ResponseEntity.status(403).build();
         }
-        
         try {
             List<usuarios> data = getFilteredUsers(role, especialidad, texto);
-            String title = "Reporte de Usuarios - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            
-            byte[] csvBytes = documentService.generateCsvReport(data, title);
-            ByteArrayResource resource = new ByteArrayResource(csvBytes);
-            
+            String title = "Reporte de Usuarios - " +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            byte[] report = reportService.generateReport(data, title, "csv");
+            ByteArrayResource resource = new ByteArrayResource(report);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_usuarios.csv")
                     .contentType(MediaType.TEXT_PLAIN)
-                    .contentLength(csvBytes.length)
+                    .contentLength(report.length)
                     .body(resource);
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
@@ -240,45 +251,44 @@ public class AdminController {
         if (!hasRole(session, "admin")) {
             return ResponseEntity.status(403).build();
         }
-        
         try {
             List<usuarios> data = getFilteredUsers(role, especialidad, texto);
-            String title = "Reporte de Usuarios - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            
-            byte[] txtBytes = documentService.generateTextReport(data, title);
-            ByteArrayResource resource = new ByteArrayResource(txtBytes);
-            
+            String title = "Reporte de Usuarios - " +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            byte[] report = reportService.generateReport(data, title, "txt");
+            ByteArrayResource resource = new ByteArrayResource(report);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_usuarios.txt")
                     .contentType(MediaType.TEXT_PLAIN)
-                    .contentLength(txtBytes.length)
+                    .contentLength(report.length)
                     .body(resource);
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
-    // Método auxiliar para obtener usuarios filtrados
+    // Método auxiliar para obtener usuarios filtrados según los parámetros de reporte
     private List<usuarios> getFilteredUsers(String role, String especialidad, String texto) {
         List<usuarios> data = new ArrayList<>(usuarioService.listarUsuarios());
-        
         if (role != null && !role.isBlank()) {
-            data = data.stream().filter(u -> role.equalsIgnoreCase(u.getUserType())).collect(Collectors.toList());
+            data = data.stream()
+                    .filter(u -> role.equalsIgnoreCase(u.getUserType()))
+                    .collect(Collectors.toList());
         }
         if (especialidad != null && !especialidad.isBlank()) {
-            data = data.stream().filter(u -> u.getEspecialidades() != null && u.getEspecialidades().toLowerCase().contains(especialidad.toLowerCase())).collect(Collectors.toList());
+            data = data.stream()
+                    .filter(u -> u.getEspecialidades() != null &&
+                            u.getEspecialidades().toLowerCase().contains(especialidad.toLowerCase()))
+                    .collect(Collectors.toList());
         }
         if (texto != null && !texto.isBlank()) {
             String t = texto.toLowerCase();
-            data = data.stream().filter(u ->
-                (u.getNombre() != null && u.getNombre().toLowerCase().contains(t)) ||
-                (u.getApellido() != null && u.getApellido().toLowerCase().contains(t)) ||
-                (u.getEmail() != null && u.getEmail().toLowerCase().contains(t))
-            ).collect(Collectors.toList());
+            data = data.stream()
+                    .filter(u -> (u.getNombre() != null && u.getNombre().toLowerCase().contains(t)) ||
+                            (u.getApellido() != null && u.getApellido().toLowerCase().contains(t)) ||
+                            (u.getEmail() != null && u.getEmail().toLowerCase().contains(t)))
+                    .collect(Collectors.toList());
         }
-        
         return data;
     }
 }
-
-
