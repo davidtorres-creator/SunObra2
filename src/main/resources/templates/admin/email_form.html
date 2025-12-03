@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Enviar Mensaje</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Enviar Mensaje Masivo</h2>
+
+    <form th:action="@{/admin/email/send-mass}" method="post">
+
+        <div class="mb-3">
+            <label>Destinatarios (separados por coma):</label>
+            <input type="text" class="form-control" name="recipients"
+                   placeholder="correo1@gmail.com, correo2@gmail.com">
+        </div>
+
+        <div class="mb-3">
+            <label>Asunto:</label>
+            <input type="text" class="form-control" name="subject">
+        </div>
+
+        <div class="mb-3">
+            <label>Mensaje:</label>
+            <textarea class="form-control" name="message" rows="6"></textarea>
+        </div>
+
+        <button class="btn btn-primary">Enviar Mensaje</button>
+        <a href="/admin/dashboard" class="btn btn-secondary">Volver</a>
+    </form>
+</div>
+
+</body>
+</html>

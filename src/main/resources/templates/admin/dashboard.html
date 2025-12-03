@@ -6,42 +6,56 @@
     <link href="/css/dashboardadmin.css" rel="stylesheet">
 </head>
 <body>
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a class="navbar-brand" href="#">SunObra - Admin</a>
-            <ul class="navbar-links">
-                <li><a href="/">Inicio</a></li>
-                <li><a href="/admin/users">Usuarios</a></li>
-                <li><a href="/admin/reports">Reportes</a></li>
-            </ul>
-            <a class="btn-logout" href="/logout">Cerrar sesión</a>
-        </div>
-    </nav>
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-container">
+        <a class="navbar-brand" href="#">SunObra - Admin</a>
+        <ul class="navbar-links">
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/admin/users">Usuarios</a></li>
+            <li><a href="/admin/reports">Reportes</a></li>
+            <!-- OPCIONAL: acceso desde el menú -->
+            <li><a href="/admin/email/form">Enviar mensaje</a></li>
+        </ul>
+        <a class="btn-logout" href="/logout">Cerrar sesión</a>
+    </div>
+</nav>
 
-    <!-- CONTENIDO -->
-    <div class="container">
-        <h1 class="title">Panel de Administración</h1>
-        <div class="cards">
-            <!-- Card Usuarios -->
-            <div class="card card-blue">
-                <h5>Total Usuarios</h5>
-                <div class="card-value" th:text="${totalUsuarios}">0</div>
-                <a href="/admin/users" class="btn-card">Gestionar</a>
-            </div>
-            
-            <!-- Card Contratos -->
-            <div class="card card-yellow">
-                <h5>Reportes Avanzados</h5>
-                <div class="card-value" th:text="${contratosActivos}">0</div>
-                <a href="/admin/reports" class="btn-card dark">Ver</a>
-            </div>
+<!-- CONTENIDO -->
+<div class="container">
+    <h1 class="title">Panel de Administración</h1>
+
+    <!-- Mensajes flash (éxito / error) -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <div class="cards">
+        <!-- Card Usuarios -->
+        <div class="card card-blue">
+            <h5>Total Usuarios</h5>
+            <div class="card-value" th:text="${totalUsuarios}">0</div>
+            <a href="/admin/users" class="btn-card">Gestionar</a>
+        </div>
+
+        <!-- Card Reportes -->
+        <div class="card card-yellow">
+            <h5>Reportes Avanzados</h5>
+            <div class="card-value" th:text="${contratosActivos}">0</div>
+            <a href="/admin/reports" class="btn-card dark">Ver</a>
+        </div>
+
+        <!-- ✅ NUEVA CARD: Envío de correos -->
+        <div class="card card-green">
+            <h5>Envío de Correos</h5>
+            <p class="card-subtitle">Mensajes masivos a usuarios</p>
+            <a href="/admin/email/form" class="btn-card">Enviar mensaje</a>
         </div>
     </div>
+</div>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        © 2025 SunObra - Plataforma de Servicios de Construcción
-    </footer>
+<!-- FOOTER -->
+<footer class="footer">
+    © 2025 SunObra - Plataforma de Servicios de Construcción
+</footer>
 </body>
 </html>
