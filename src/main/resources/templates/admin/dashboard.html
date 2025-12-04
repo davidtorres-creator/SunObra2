@@ -14,8 +14,10 @@
             <li><a href="/">Inicio</a></li>
             <li><a href="/admin/users">Usuarios</a></li>
             <li><a href="/admin/reports">Reportes</a></li>
-            <!-- OPCIONAL: acceso desde el menú -->
             <li><a href="/admin/email/form">Enviar mensaje</a></li>
+
+            <!-- 🔵 NUEVO: acceso al módulo de gráficos -->
+            <li><a href="/admin/charts">Gráficos</a></li>
         </ul>
         <a class="btn-logout" href="/logout">Cerrar sesión</a>
     </div>
@@ -25,7 +27,7 @@
 <div class="container">
     <h1 class="title">Panel de Administración</h1>
 
-    <!-- Mensajes flash (éxito / error) -->
+    <!-- Mensajes flash -->
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
@@ -44,12 +46,20 @@
             <a href="/admin/reports" class="btn-card dark">Ver</a>
         </div>
 
-        <!-- ✅ NUEVA CARD: Envío de correos -->
+        <!-- Card Envío de Correos -->
         <div class="card card-green">
             <h5>Envío de Correos</h5>
             <p class="card-subtitle">Mensajes masivos a usuarios</p>
             <a href="/admin/email/form" class="btn-card">Enviar mensaje</a>
         </div>
+
+        <!-- 🟣 NUEVA CARD: Gráficos -->
+        <div class="card card-purple">
+            <h5>Gráficos / Estadísticas</h5>
+            <p class="card-subtitle">Ver datos visuales</p>
+            <a href="/admin/charts" class="btn-card">Ver gráficos</a>
+        </div>
+
     </div>
 </div>
 

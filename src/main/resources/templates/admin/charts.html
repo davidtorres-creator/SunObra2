@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Gráficos</title>
+    <link rel="stylesheet" href="/css/dashboardadmin.css">
+</head>
+<body>
+<h1>Gráficos del Sistema</h1>
+
+<section>
+    <h2>Usuarios por Rol</h2>
+    <!-- El src apunta al endpoint que genera la imagen -->
+    <img th:src="@{/admin/charts/roles}" alt="Usuarios por rol"/>
+    <!-- Enlace para exportar a PDF -->
+    <a th:href="@{/admin/charts/roles/pdf}" class="btn">Descargar PDF</a>
+</section>
+
+<!-- Agregar más secciones para otros gráficos -->
+
+</body>
+</html>

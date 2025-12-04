@@ -1,36 +1,57 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8" />
     <title>Enviar Mensaje</title>
+
+    <!-- Bootstrap -->
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+
+    <!-- 🔗 ESTILO PERSONALIZADO SEPARADO -->
+    <link rel="stylesheet" th:href="@{/css/email-form.css}" />
 </head>
+
 <body>
 
-<div class="container mt-5">
-    <h2>Enviar Mensaje Masivo</h2>
+<div class="panel">
+    <div class="panel-header">
+        <h2 class="panel-title">Enviar Mensaje</h2>
 
-    <form th:action="@{/admin/email/send-mass}" method="post">
-
-        <div class="mb-3">
-            <label>Destinatarios (separados por coma):</label>
-            <input type="text" class="form-control" name="recipients"
-                   placeholder="correo1@gmail.com, correo2@gmail.com">
+        <div class="bar">
+            <span class="badge">✉️ Mensaje masivo</span>
+            <span class="hint">Usa comas para múltiples correos</span>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <label>Asunto:</label>
-            <input type="text" class="form-control" name="subject">
-        </div>
+    <div class="panel-body">
 
-        <div class="mb-3">
-            <label>Mensaje:</label>
-            <textarea class="form-control" name="message" rows="6"></textarea>
-        </div>
+        <form th:action="@{/admin/email/send-mass}" method="post">
 
-        <button class="btn btn-primary">Enviar Mensaje</button>
-        <a href="/admin/dashboard" class="btn btn-secondary">Volver</a>
-    </form>
+            <div class="mb-3">
+                <label class="form-label">Destinatarios (separados por coma)</label>
+                <input type="text" class="form-control" name="recipients"
+                       placeholder="correo1@gmail.com, correo2@gmail.com">
+                <div class="hint mt-1">Ej: juan@gmail.com, ana@gmail.com</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Asunto</label>
+                <input type="text" class="form-control" name="subject" placeholder="Anuncio importante">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mensaje</label>
+                <textarea class="form-control" name="message" rows="8"
+                          placeholder="Escribe tu mensaje..."></textarea>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" type="submit">Enviar Mensaje</button>
+                <a href="/admin/dashboard" class="btn btn-secondary">Volver</a>
+            </div>
+
+        </form>
+    </div>
 </div>
 
 </body>
