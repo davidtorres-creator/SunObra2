@@ -2,21 +2,47 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Gráficos</title>
-    <link rel="stylesheet" href="/css/dashboardadmin.css">
+
+    <!-- 🔗 ESTILO PERSONALIZADO -->
+    <link rel="stylesheet" th:href="@{/css/charts-modern.css}">
 </head>
 <body>
+
 <h1>Gráficos del Sistema</h1>
 
-<section>
-    <h2>Usuarios por Rol</h2>
-    <!-- El src apunta al endpoint que genera la imagen -->
-    <img th:src="@{/admin/charts/roles}" alt="Usuarios por rol"/>
-    <!-- Enlace para exportar a PDF -->
-    <a th:href="@{/admin/charts/roles/pdf}" class="btn">Descargar PDF</a>
-</section>
+<div class="charts-grid">
+    <section>
+        <span class="info-badge">📊 Estadísticas en tiempo real</span>
+        <h2>Usuarios por Rol</h2>
+        <!-- El src apunta al endpoint que genera la imagen -->
+        <img th:src="@{/admin/charts/roles}" alt="Usuarios por rol"/>
+        <!-- Enlace para exportar a PDF -->
+        <a th:href="@{/admin/charts/roles/pdf}" class="btn">Descargar PDF</a>
+    </section>
 
-<!-- Agregar más secciones para otros gráficos -->
+    <!-- Agregar más secciones para otros gráficos -->
+
+    <!-- Ejemplo de otra sección -->
+    <!--
+    <section>
+        <span class="info-badge">📈 Análisis mensual</span>
+        <h2>Ventas del Mes</h2>
+        <img th:src="@{/admin/charts/ventas}" alt="Ventas mensuales"/>
+        <a th:href="@{/admin/charts/ventas/pdf}" class="btn">Descargar PDF</a>
+    </section>
+    -->
+
+    <!--
+    <section>
+        <span class="info-badge">👥 Actividad de usuarios</span>
+        <h2>Usuarios Activos</h2>
+        <img th:src="@{/admin/charts/activos}" alt="Usuarios activos"/>
+        <a th:href="@{/admin/charts/activos/pdf}" class="btn">Descargar PDF</a>
+    </section>
+    -->
+</div>
 
 </body>
 </html>

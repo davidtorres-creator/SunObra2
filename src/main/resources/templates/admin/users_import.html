@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importar Usuarios</title>
+
+    <!-- Bootstrap (opcional si lo necesitas para otras cosas) -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <!-- 🔗 ESTILO PERSONALIZADO -->
+    <link rel="stylesheet" th:href="@{/css/import-users.css}">
+</head>
+<body>
+
+<div class="container">
+    <h2>Importar usuarios</h2>
+    <p class="text-muted">
+        Formato: <code>nombre, apellido, email, userType, especialidades, experiencia, telefono, direccion, password</code>
+    </p>
+
+    <div class="mb-3">
+        <a class="btn btn-outline-secondary" th:href="@{/admin/users/template.csv}">
+            📥 Descargar plantilla CSV
+        </a>
+        <a class="btn btn-secondary" th:href="@{/admin/users}">
+            ← Volver a usuarios
+        </a>
+    </div>
+
+    <form th:action="@{/admin/users/import}" method="post" enctype="multipart/form-data" class="card">
+        <div class="mb-3">
+            <label class="form-label">📁 Archivo (.csv, .xls, .xlsx)</label>
+            <input class="form-control" type="file" name="file" required accept=".csv,.xls,.xlsx">
+        </div>
+        <button class="btn btn-primary" type="submit">
+            🚀 Importar usuarios
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,8 +1,8 @@
 package com.example.controller;
 
 import com.example.model.usuarios;
-import com.example.service.UsuarioService;
 import com.example.service.ReportService;
+import com.example.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -13,21 +13,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Controlador para las funcionalidades administrativas.
  *
- * <p>Incluye operaciones de CRUD para usuarios y la generación de reportes
- * en distintos formatos. Este controlador utiliza {@link ReportService}
- * para delegar la generación de reportes, aplicando así el patrón de
- * estrategia en la capa de servicio.</p>
+ * Incluye CRUD de usuarios, reportes y carga masiva desde CSV/Excel.
  */
 @Controller
 @RequestMapping("/admin")
@@ -44,30 +42,29 @@ public class AdminController {
         return r != null && Objects.equals(r.toString(), role);
     }
 
+    // =======================
+    // DASHBOARD
+    // =======================
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
-        System.out.println("=== ADMIN DASHBOARD ===");
-        System.out.println("Session user_id: " + session.getAttribute("user_id"));
-        System.out.println("Session user_role: " + session.getAttribute("user_role"));
         if (!hasRole(session, "admin")) {
-            System.out.println("ERROR: Usuario no tiene rol de admin");
             return "redirect:/auth/login";
         }
         model.addAttribute("title", "Panel de Administración");
         model.addAttribute("totalUsuarios", usuarioService.listarUsuarios().size());
         model.addAttribute("fecha", LocalDateTime.now());
-        System.out.println("=== REDIRIGIENDO A ADMIN DASHBOARD ===");
         return "admin/dashboard";
     }
 
-    // CRUD Usuarios
+    // =======================
+    // CRUD USUARIOS
+    // =======================
     @GetMapping("/users")
     public String listUsers(HttpSession session, Model model,
                             @RequestParam(required = false) String role,
                             @RequestParam(required = false) String q) {
-        if (!hasRole(session, "admin")) {
-            return "redirect:/auth/login";
-        }
+        if (!hasRole(session, "admin")) return "redirect:/auth/login";
+
         List<usuarios> data = new ArrayList<>(usuarioService.listarUsuarios());
         if (role != null && !role.isBlank()) {
             data = data.stream()
@@ -91,9 +88,7 @@ public class AdminController {
 
     @GetMapping("/users/new")
     public String newUser(HttpSession session, Model model) {
-        if (!hasRole(session, "admin")) {
-            return "redirect:/auth/login";
-        }
+        if (!hasRole(session, "admin")) return "redirect:/auth/login";
         model.addAttribute("usuario", new usuarios());
         model.addAttribute("isEdit", false);
         return "admin/user_form";
@@ -101,10 +96,9 @@ public class AdminController {
 
     @PostMapping("/users")
     public String createUser(HttpSession session, @ModelAttribute("usuario") usuarios user,
-                             BindingResult result) {
-        if (!hasRole(session, "admin")) {
-            return "redirect:/auth/login";
-        }
+                             BindingResult result, RedirectAttributes ra) {
+        if (!hasRole(session, "admin")) return "redirect:/auth/login";
+
         if (user.getEmail() == null || user.getEmail().isBlank()) {
             result.rejectValue("email", "email.required", "El email es requerido");
         }
@@ -116,6 +110,7 @@ public class AdminController {
         }
         try {
             usuarioService.registrarUsuario(user);
+            ra.addFlashAttribute("success", "Usuario creado correctamente.");
             return "redirect:/admin/users";
         } catch (Exception e) {
             result.rejectValue("email", "email.duplicate", "Error al crear usuario: " + e.getMessage());
@@ -125,13 +120,9 @@ public class AdminController {
 
     @GetMapping("/users/{id}/edit")
     public String editUser(HttpSession session, @PathVariable Long id, Model model) {
-        if (!hasRole(session, "admin")) {
-            return "redirect:/auth/login";
-        }
+        if (!hasRole(session, "admin")) return "redirect:/auth/login";
         usuarios u = usuarioService.buscarPorId(id);
-        if (u == null) {
-            return "redirect:/admin/users";
-        }
+        if (u == null) return "redirect:/admin/users";
         model.addAttribute("usuario", u);
         model.addAttribute("isEdit", true);
         return "admin/user_form";
@@ -139,33 +130,78 @@ public class AdminController {
 
     @PostMapping("/users/{id}")
     public String updateUser(HttpSession session, @PathVariable Long id,
-                             @ModelAttribute("usuario") usuarios user, BindingResult result) {
-        if (!hasRole(session, "admin")) {
-            return "redirect:/auth/login";
-        }
+                             @ModelAttribute("usuario") usuarios user, BindingResult result,
+                             RedirectAttributes ra) {
+        if (!hasRole(session, "admin")) return "redirect:/auth/login";
         user.setId(id);
         usuarioService.actualizarUsuario(user);
+        ra.addFlashAttribute("success", "Usuario actualizado correctamente.");
         return "redirect:/admin/users";
     }
 
     @PostMapping("/users/{id}/delete")
-    public String deleteUser(HttpSession session, @PathVariable Long id) {
-        if (!hasRole(session, "admin")) {
-            return "redirect:/auth/login";
-        }
+    public String deleteUser(HttpSession session, @PathVariable Long id, RedirectAttributes ra) {
+        if (!hasRole(session, "admin")) return "redirect:/auth/login";
         usuarioService.eliminarUsuario(id);
+        ra.addFlashAttribute("success", "Usuario eliminado.");
         return "redirect:/admin/users";
     }
 
-    // Reportes con filtros multicriterio (en memoria)
+    // =======================
+    // CARGA MASIVA USUARIOS
+    // =======================
+
+    /** Vista con el formulario de importación */
+    @GetMapping("/users/import")
+    public String importForm(HttpSession session, Model model) {
+        if (!hasRole(session, "admin")) return "redirect:/auth/login";
+        model.addAttribute("title", "Importar usuarios (CSV / Excel)");
+        return "admin/users_import";
+    }
+
+    /** Procesa el archivo CSV/XLS/XLSX */
+    @PostMapping(value = "/users/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String importUsers(HttpSession session,
+                              @RequestParam("file") MultipartFile file,
+                              RedirectAttributes ra) {
+        if (!hasRole(session, "admin")) return "redirect:/auth/login";
+        try {
+            int inserted = usuarioService.importarUsuarios(file);
+            ra.addFlashAttribute("success",
+                    "Importación completada. Registros nuevos: " + inserted);
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "No se pudo importar: " + e.getMessage());
+        }
+        return "redirect:/admin/users";
+    }
+
+    /** Descarga plantilla CSV */
+    @GetMapping("/users/template.csv")
+    public ResponseEntity<ByteArrayResource> downloadTemplate() {
+        String header = "nombre,apellido,email,userType,especialidades,experiencia,telefono,direccion,password\n";
+        String sample =
+                "Juan,Perez,juan.perez@example.com,cliente,,0,3000000000,Cra 1 #2-3,SunObra123*\n" +
+                        "Ana,Gomez,ana.gomez@example.com,obrero,Albañileria;Pintura,5,3200000000,Calle 45 #67-89,\n" +
+                        "Admin,Sistema,admin@sunobra.com,admin,,0,3138385779,Bogotá,Admin*2025\n";
+        byte[] bytes = (header + sample).getBytes(StandardCharsets.UTF_8);
+        ByteArrayResource res = new ByteArrayResource(bytes);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=plantilla_usuarios.csv")
+                .contentType(MediaType.TEXT_PLAIN)
+                .contentLength(bytes.length)
+                .body(res);
+    }
+
+    // =======================
+    // REPORTES
+    // =======================
     @GetMapping("/reports")
     public String reports(HttpSession session, Model model,
                           @RequestParam(required = false) String role,
                           @RequestParam(required = false) String especialidad,
                           @RequestParam(required = false) String texto) {
-        if (!hasRole(session, "admin")) {
-            return "redirect:/auth/login";
-        }
+        if (!hasRole(session, "admin")) return "redirect:/auth/login";
+
         List<usuarios> data = new ArrayList<>(usuarioService.listarUsuarios());
         if (role != null && !role.isBlank()) {
             data = data.stream()
@@ -194,26 +230,22 @@ public class AdminController {
         return "admin/reports";
     }
 
-    // Endpoints para generar reportes en diferentes formatos
     @GetMapping("/reports/export/html")
     public ResponseEntity<ByteArrayResource> exportHtml(HttpSession session,
                                                         @RequestParam(required = false) String role,
                                                         @RequestParam(required = false) String especialidad,
                                                         @RequestParam(required = false) String texto) {
-        if (!hasRole(session, "admin")) {
-            return ResponseEntity.status(403).build();
-        }
+        if (!hasRole(session, "admin")) return ResponseEntity.status(403).build();
         try {
             List<usuarios> data = getFilteredUsers(role, especialidad, texto);
             String title = "Reporte de Usuarios - " +
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             byte[] report = reportService.generateReport(data, title, "html");
-            ByteArrayResource resource = new ByteArrayResource(report);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_usuarios.html")
                     .contentType(MediaType.TEXT_HTML)
                     .contentLength(report.length)
-                    .body(resource);
+                    .body(new ByteArrayResource(report));
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
@@ -221,23 +253,20 @@ public class AdminController {
 
     @GetMapping("/reports/export/csv")
     public ResponseEntity<ByteArrayResource> exportCsv(HttpSession session,
-                                                      @RequestParam(required = false) String role,
-                                                      @RequestParam(required = false) String especialidad,
-                                                      @RequestParam(required = false) String texto) {
-        if (!hasRole(session, "admin")) {
-            return ResponseEntity.status(403).build();
-        }
+                                                       @RequestParam(required = false) String role,
+                                                       @RequestParam(required = false) String especialidad,
+                                                       @RequestParam(required = false) String texto) {
+        if (!hasRole(session, "admin")) return ResponseEntity.status(403).build();
         try {
             List<usuarios> data = getFilteredUsers(role, especialidad, texto);
             String title = "Reporte de Usuarios - " +
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             byte[] report = reportService.generateReport(data, title, "csv");
-            ByteArrayResource resource = new ByteArrayResource(report);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_usuarios.csv")
                     .contentType(MediaType.TEXT_PLAIN)
                     .contentLength(report.length)
-                    .body(resource);
+                    .body(new ByteArrayResource(report));
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
@@ -245,29 +274,26 @@ public class AdminController {
 
     @GetMapping("/reports/export/txt")
     public ResponseEntity<ByteArrayResource> exportTxt(HttpSession session,
-                                                      @RequestParam(required = false) String role,
-                                                      @RequestParam(required = false) String especialidad,
-                                                      @RequestParam(required = false) String texto) {
-        if (!hasRole(session, "admin")) {
-            return ResponseEntity.status(403).build();
-        }
+                                                       @RequestParam(required = false) String role,
+                                                       @RequestParam(required = false) String especialidad,
+                                                       @RequestParam(required = false) String texto) {
+        if (!hasRole(session, "admin")) return ResponseEntity.status(403).build();
         try {
             List<usuarios> data = getFilteredUsers(role, especialidad, texto);
             String title = "Reporte de Usuarios - " +
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             byte[] report = reportService.generateReport(data, title, "txt");
-            ByteArrayResource resource = new ByteArrayResource(report);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_usuarios.txt")
                     .contentType(MediaType.TEXT_PLAIN)
                     .contentLength(report.length)
-                    .body(resource);
+                    .body(new ByteArrayResource(report));
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
-    // Método auxiliar para obtener usuarios filtrados según los parámetros de reporte
+    // Auxiliar de filtros
     private List<usuarios> getFilteredUsers(String role, String especialidad, String texto) {
         List<usuarios> data = new ArrayList<>(usuarioService.listarUsuarios());
         if (role != null && !role.isBlank()) {

@@ -7,9 +7,18 @@
 </head>
 <body>
 <div class="container">
+
+    <!-- Flash messages -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
     <div class="header">
         <h2>Usuarios</h2>
-        <a class="btn btn-primary" href="/admin/users/new">Nuevo Usuario</a>
+        <div class="actions">
+            <a class="btn btn-success" th:href="@{/admin/users/import}">Importar CSV/Excel</a>
+            <a class="btn btn-outline-secondary" th:href="@{/admin/users/template.csv}">Descargar plantilla</a>
+            <a class="btn btn-primary" href="/admin/users/new">Nuevo Usuario</a>
+        </div>
     </div>
 
     <form class="filter-form" method="get">
@@ -22,6 +31,17 @@
 
         <input type="search" name="q" placeholder="Buscar..." th:value="${q}">
         <button type="submit" class="btn btn-secondary">Filtrar</button>
+
+        <!-- Exportar (respeta los filtros actuales) -->
+        <div class="export-group">
+            <span>Exportar:</span>
+            <a class="btn btn-light"
+               th:href="@{/admin/reports/export/html(role=${filterRole}, texto=${q})}">HTML</a>
+            <a class="btn btn-light"
+               th:href="@{/admin/reports/export/csv(role=${filterRole}, texto=${q})}">CSV</a>
+            <a class="btn btn-light"
+               th:href="@{/admin/reports/export/txt(role=${filterRole}, texto=${q})}">TXT</a>
+        </div>
     </form>
 
     <table class="tabla-usuarios">
@@ -31,26 +51,32 @@
             <th>Nombre</th>
             <th>Email</th>
             <th>Rol</th>
-            <th>Acciones</th>
+            <th style="width:240px">Acciones</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="u : ${usuarios}">
-            <td th:text="${u.id}"></td>
-            <td th:text="${u.nombre + ' ' + u.apellido}"></td>
-            <td th:text="${u.email}"></td>
-            <td th:text="${u.userType}"></td>
+            <td th:text="${u.id}">1</td>
+            <td th:text="${u.nombre + ' ' + u.apellido}">Nombre Apellido</td>
+            <td th:text="${u.email}">correo@ejemplo.com</td>
+            <td th:text="${u.userType}">cliente</td>
             <td>
                 <a class="btn btn-outline-primary" th:href="@{'/admin/users/' + ${u.id} + '/edit'}">Editar</a>
                 <form th:action="@{'/admin/users/' + ${u.id} + '/delete'}" method="post" style="display:inline">
-                    <button class="btn btn-outline-danger" type="submit">Eliminar</button>
+                    <button class="btn btn-outline-danger" type="submit"
+                            onclick="return confirm('¿Eliminar este usuario?')">Eliminar</button>
                 </form>
             </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(usuarios)}">
+            <td colspan="5" style="text-align:center; padding:16px;">No hay usuarios para mostrar.</td>
         </tr>
         </tbody>
     </table>
 
-    <a class="btn btn-back" href="/admin/dashboard">Volver</a>
+    <div class="footer-actions">
+        <a class="btn btn-back" href="/admin/dashboard">Volver</a>
+    </div>
 </div>
 </body>
 </html>
