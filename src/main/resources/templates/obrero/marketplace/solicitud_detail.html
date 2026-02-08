@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Detalle solicitud</title>
+</head>
+<body>
+
+<a href="/obrero/marketplace/solicitudes">← Volver</a>
+
+<h2>Detalle de solicitud</h2>
+
+<p th:if="${success}" th:text="${success}" style="color:green;"></p>
+<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+
+<hr/>
+
+<p><b>ID:</b> <span th:text="${solicitud.id}"></span></p>
+<p><b>Especialidad:</b> <span th:text="${solicitud.especialidad}"></span></p>
+<p><b>Urgencia:</b> <span th:text="${solicitud.urgencia}"></span></p>
+<p><b>Ubicación:</b> <span th:text="${solicitud.ubicacion}"></span></p>
+<p><b>Estado:</b> <span th:text="${solicitud.estado}"></span></p>
+
+<p><b>Descripción:</b></p>
+<p th:text="${solicitud.descripcion}"></p>
+
+<hr/>
+
+<!-- Si ya cotizó, mostrarla -->
+<div th:if="${miCotizacion != null}">
+    <h3>Tu cotización enviada</h3>
+    <p><b>Precio:</b> <span th:text="${miCotizacion.precio}"></span></p>
+    <p><b>Tiempo estimado (días):</b> <span th:text="${miCotizacion.tiempoEstimadoDias}"></span></p>
+    <p><b>Mensaje:</b> <span th:text="${miCotizacion.mensaje}"></span></p>
+    <p><b>Estado:</b> <span th:text="${miCotizacion.estado}"></span></p>
+</div>
+
+<!-- Si NO cotizó, mostrar formulario -->
+<div th:if="${miCotizacion == null}">
+    <h3>Enviar cotización</h3>
+
+    <form th:action="@{'/obrero/marketplace/solicitudes/' + ${solicitud.id} + '/cotizar'}"
+          method="post"
+          th:object="${form}">
+
+        <label>Precio *</label><br/>
+        <input type="number" step="0.01" th:field="*{precio}" required /><br/><br/>
+
+        <label>Tiempo estimado (días)</label><br/>
+        <input type="number" th:field="*{tiempoEstimadoDias}" /><br/><br/>
+
+        <label>Mensaje</label><br/>
+        <textarea th:field="*{mensaje}" rows="4" cols="50"></textarea><br/><br/>
+
+        <button type="submit">Enviar</button>
+    </form>
+</div>
+
+</body>
+</html>

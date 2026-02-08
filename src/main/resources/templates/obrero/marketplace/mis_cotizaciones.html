@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mis Cotizaciones</title>
+</head>
+<body>
+
+<h2>Mis Cotizaciones</h2>
+
+<a href="/obrero/dashboard">Volver al dashboard</a>
+<br/><br/>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Solicitud</th>
+        <th>Precio</th>
+        <th>Estado</th>
+        <th>Creada</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="c : ${cotizaciones}">
+        <td th:text="${c.id}">1</td>
+        <td th:text="${c.solicitudId}">12</td>
+        <td th:text="${c.precio}">50000</td>
+        <td th:text="${c.estado}">ENVIADA</td>
+        <td th:text="${c.createdAt}">2026-02-08</td>
+        <td>
+            <a th:href="@{'/obrero/marketplace/solicitudes/' + ${c.solicitudId}}">
+                Ver Solicitud
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Solicitudes disponibles</title>
+</head>
+<body>
+
+<h2>Solicitudes disponibles (ABIERTAS)</h2>
+
+<a href="/obrero/dashboard">Volver al dashboard</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Especialidad</th>
+        <th>Urgencia</th>
+        <th>Ubicación</th>
+        <th>Creada</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="s : ${solicitudes}">
+        <td th:text="${s.id}">1</td>
+        <td th:text="${s.especialidad}">Electricidad</td>
+        <td th:text="${s.urgencia}">MEDIA</td>
+        <td th:text="${s.ubicacion}">Bogotá</td>
+        <td th:text="${s.createdAt}">2026-02-08</td>
+        <td>
+            <a th:href="@{'/obrero/marketplace/solicitudes/' + ${s.id}}">
+                Ver / Cotizar
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

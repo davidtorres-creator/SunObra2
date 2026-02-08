@@ -1,5 +1,6 @@
 package com.example.SunObra.marketplace.repository;
 
+import com.example.SunObra.marketplace.enums.SolicitudStatus;
 import com.example.SunObra.marketplace.model.Solicitud;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,7 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
 
     // Para evitar que un cliente vea solicitudes de otro
     Optional<Solicitud> findByIdAndClienteId(Long id, Long clienteId);
+
+    // NUEVO: solicitudes abiertas para marketplace obrero
+    List<Solicitud> findByEstadoOrderByIdDesc(SolicitudStatus estado);
 }
