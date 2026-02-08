@@ -8,7 +8,7 @@ package com.example.service.report;
  * de condicionales por todo el código. Si se requieren nuevos formatos,
  * basta con añadir un nuevo caso y su clase correspondiente.</p>
  */
-public class ReportStrategyFactory {
+public class    ReportStrategyFactory {
 
     /**
      * Devuelve la estrategia adecuada según el identificador de formato.

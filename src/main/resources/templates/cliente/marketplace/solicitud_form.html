@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Nueva solicitud</title>
+</head>
+<body>
+
+<h2>Nueva solicitud</h2>
+
+<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+
+<form method="post" action="/cliente/marketplace/solicitudes" th:object="${form}">
+
+    <label>Especialidad *</label><br/>
+    <input type="text" th:field="*{especialidad}" required /><br/><br/>
+
+    <label>Descripción *</label><br/>
+    <textarea th:field="*{descripcion}" rows="5" cols="50" required></textarea><br/><br/>
+
+    <label>Ubicación</label><br/>
+    <input type="text" th:field="*{ubicacion}" /><br/><br/>
+
+    <label>Presupuesto mínimo</label><br/>
+    <input type="number" step="0.01" th:field="*{presupuestoMin}" /><br/><br/>
+
+    <label>Presupuesto máximo</label><br/>
+    <input type="number" step="0.01" th:field="*{presupuestoMax}" /><br/><br/>
+
+    <label>Urgencia</label><br/>
+    <select th:field="*{urgencia}">
+        <option value="BAJA">BAJA</option>
+        <option value="MEDIA">MEDIA</option>
+        <option value="ALTA">ALTA</option>
+    </select><br/><br/>
+
+    <button type="submit">Crear</button>
+    <a href="/cliente/marketplace/solicitudes">Cancelar</a>
+</form>
+
+</body>
+</html>
