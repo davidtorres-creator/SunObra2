@@ -2,6 +2,8 @@ package com.example.SunObra.marketplace.controller;
 
 import com.example.SunObra.marketplace.model.Solicitud;
 import com.example.SunObra.marketplace.service.MarketplaceClienteService;
+import com.example.SunObra.marketplace.service.ReviewCreateRequest;
+import com.example.SunObra.marketplace.service.ReviewService;
 import com.example.SunObra.marketplace.service.ServicioService;
 import com.example.SunObra.marketplace.service.SolicitudCreateRequest;
 import com.example.SunObra.marketplace.service.SolicitudService;
@@ -20,13 +22,16 @@ public class ClienteMarketplaceController {
     private final SolicitudService solicitudService;
     private final MarketplaceClienteService marketplaceClienteService;
     private final ServicioService servicioService;
+    private final ReviewService reviewService;
 
     public ClienteMarketplaceController(SolicitudService solicitudService,
                                         MarketplaceClienteService marketplaceClienteService,
-                                        ServicioService servicioService) {
+                                        ServicioService servicioService,
+                                        ReviewService reviewService) {
         this.solicitudService = solicitudService;
         this.marketplaceClienteService = marketplaceClienteService;
         this.servicioService = servicioService;
+        this.reviewService = reviewService;
     }
 
     private boolean isCliente(HttpSession session) {
@@ -118,5 +123,37 @@ public class ClienteMarketplaceController {
         model.addAttribute("servicios", servicioService.listarPorCliente(clienteId));
         return "cliente/marketplace/servicios_list";
     }
-}
 
+    @GetMapping("/servicios/{id}/review")
+    public String formReview(HttpSession session, @PathVariable Long id, Model model) {
+        if (!isCliente(session)) return "redirect:/auth/login";
+
+        if (reviewService.buscarPorServicio(id) != null) {
+            return "redirect:/cliente/marketplace/servicios";
+        }
+
+        model.addAttribute("servicioId", id);
+        model.addAttribute("form", new ReviewCreateRequest());
+        return "cliente/marketplace/review_form";
+    }
+
+    @PostMapping("/servicios/{id}/review")
+    public String guardarReview(HttpSession session,
+                                @PathVariable Long id,
+                                @ModelAttribute("form") ReviewCreateRequest form,
+                                RedirectAttributes ra) {
+        if (!isCliente(session)) return "redirect:/auth/login";
+
+        Long clienteId = getUserId(session);
+
+        try {
+            reviewService.crearReview(clienteId, id, form);
+            ra.addFlashAttribute("success", "✅ Calificación enviada.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:/cliente/marketplace/servicios/" + id + "/review";
+        }
+
+        return "redirect:/cliente/marketplace/servicios";
+    }
+}

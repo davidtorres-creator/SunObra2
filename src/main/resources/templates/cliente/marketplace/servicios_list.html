@@ -31,6 +31,7 @@
         <th>Estado</th>
         <th>Inicio</th>
         <th>Fin</th>
+        <th>Review</th>
     </tr>
     </thead>
     <tbody>
@@ -42,6 +43,14 @@
         <td th:text="${s.estado}"></td>
         <td th:text="${s.fechaInicio}"></td>
         <td th:text="${s.fechaFin}"></td>
+        <td>
+            <!-- Solo permitir calificar si el servicio está FINALIZADO -->
+            <a th:if="${s.estado.toString() == 'FINALIZADO'}"
+               th:href="@{'/cliente/marketplace/servicios/' + ${s.id} + '/review'}">
+                Calificar
+            </a>
+            <span th:if="${s.estado.toString() != 'FINALIZADO'}">-</span>
+        </td>
     </tr>
     </tbody>
 </table>
