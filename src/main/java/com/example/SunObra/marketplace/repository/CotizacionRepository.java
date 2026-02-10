@@ -16,4 +16,8 @@ public interface CotizacionRepository extends JpaRepository<Cotizacion, Long> {
 
     // Para que el cliente vea cotizaciones de su solicitud (más adelante)
     List<Cotizacion> findBySolicitudId(Long solicitudId);
+
+
+    List<Cotizacion> findBySolicitudIdOrderByIdAsc(Long solicitudId);
+
 }

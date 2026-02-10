@@ -6,20 +6,32 @@
     <link rel="stylesheet" href="/css/dashboardcliente.css">
 </head>
 <body>
-      <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a class="navbar-brand" href="/">SunObra - Cliente</a>
-            <ul class="navbar-links">
-                <li><a href="/">Inicio</a></li>
-                <li><a href="/cliente/profile">Editar Perfil</a></li>
-                <li><a href="/cliente/reports">Obreros Disponibles</a></li>
-            </ul>
-                
-            </ul>
-            <a class="btn-logout" href="/logout">Cerrar sesión</a>
-        </div>
 
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-container">
+        <a class="navbar-brand" href="/">SunObra - Cliente</a>
+
+        <ul class="navbar-links">
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/cliente/profile">Editar Perfil</a></li>
+            <li><a href="/cliente/reports">Obreros Disponibles</a></li>
+        </ul>
+
+        <a class="btn-logout" href="/logout">Cerrar sesión</a>
+    </div>
+</nav>
+
+<!-- CONTENIDO -->
+<div class="container">
+    <h1 class="title">Panel del Cliente</h1>
+    <h2 class="subtitle">
+        Bienvenido, <span th:text="${user.nombre}">Cliente</span>
+    </h2>
+
+    <div class="cards">
+
+        <!-- Marketplace / Solicitudes -->
         <div class="card">
             <h3>Mis Solicitudes</h3>
             <p>Crea y gestiona tus solicitudes de servicios.</p>
@@ -28,30 +40,40 @@
             </a>
         </div>
 
-    </nav>
-<div class="container">
-    <h1 class="title">Panel del Cliente</h1>
-    <h2 class="subtitle">Bienvenido, <span th:text="${user.nombre}">Cliente</span></h2>
+        <!-- Mis Servicios -->
+        <div class="card">
+            <h3>Mis Servicios</h3>
+            <p>Consulta los servicios que ya fueron aceptados.</p>
+            <a class="btn success" href="/cliente/marketplace/servicios">
+                Ver Servicios
+            </a>
+        </div>
 
-    <div class="cards">
+        <!-- Perfil -->
         <div class="card">
             <h3>Mi Perfil</h3>
             <p>Gestiona y actualiza tus datos personales.</p>
-            <a class="btn primary" href="/cliente/profile">Editar Perfil</a>
+            <a class="btn primary" href="/cliente/profile">
+                Editar Perfil
+            </a>
         </div>
 
+        <!-- Obreros -->
         <div class="card">
             <h3>Obreros Disponibles</h3>
-            <p>Consulta la lista de obreros registrados en el sistema.</p>
-            <a class="btn success" href="/cliente/reports">Ver Obreros</a>
+            <p>Consulta la lista de obreros registrados.</p>
+            <a class="btn success" href="/cliente/reports">
+                Ver Obreros
+            </a>
         </div>
 
-     
     </div>
 </div>
+
 <!-- FOOTER -->
-    <footer class="footer">
-        © 2025 SunObra - Plataforma de Servicios de Construcción
-    </footer>
+<footer class="footer">
+    © 2025 SunObra - Plataforma de Servicios de Construcción
+</footer>
+
 </body>
 </html>

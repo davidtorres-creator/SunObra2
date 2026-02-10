@@ -7,6 +7,7 @@ import com.example.SunObra.marketplace.repository.CotizacionRepository;
 import com.example.SunObra.marketplace.repository.SolicitudRepository;
 import com.example.SunObra.marketplace.service.CotizacionCreateRequest;
 import com.example.SunObra.marketplace.service.CotizacionService;
+import com.example.SunObra.marketplace.service.ServicioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,13 +23,16 @@ public class ObreroMarketplaceController {
     private final SolicitudRepository solicitudRepo;
     private final CotizacionService cotizacionService;
     private final CotizacionRepository cotizacionRepo;
+    private final ServicioService servicioService;
 
     public ObreroMarketplaceController(SolicitudRepository solicitudRepo,
                                        CotizacionService cotizacionService,
-                                       CotizacionRepository cotizacionRepo) {
+                                       CotizacionRepository cotizacionRepo,
+                                       ServicioService servicioService) {
         this.solicitudRepo = solicitudRepo;
         this.cotizacionService = cotizacionService;
         this.cotizacionRepo = cotizacionRepo;
+        this.servicioService = servicioService;
     }
 
     private boolean isObrero(HttpSession session) {
@@ -99,5 +103,44 @@ public class ObreroMarketplaceController {
         model.addAttribute("cotizaciones", cotizacionRepo.findByObreroIdOrderByIdDesc(obreroId));
         return "obrero/marketplace/mis_cotizaciones";
     }
+
+    @GetMapping("/servicios")
+    public String misServicios(HttpSession session, Model model) {
+        if (!isObrero(session)) return "redirect:/auth/login";
+
+        Long obreroId = getUserId(session);
+        model.addAttribute("servicios", servicioService.listarPorObrero(obreroId));
+        return "obrero/marketplace/servicios_list";
+    }
+
+    @PostMapping("/servicios/{id}/iniciar")
+    public String iniciarServicio(HttpSession session, @PathVariable Long id, RedirectAttributes ra) {
+        if (!isObrero(session)) return "redirect:/auth/login";
+
+        Long obreroId = getUserId(session);
+        try {
+            servicioService.iniciarServicio(id, obreroId);
+            ra.addFlashAttribute("success", "✅ Servicio iniciado.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/obrero/marketplace/servicios";
+    }
+
+    @PostMapping("/servicios/{id}/finalizar")
+    public String finalizarServicio(HttpSession session, @PathVariable Long id, RedirectAttributes ra) {
+        if (!isObrero(session)) return "redirect:/auth/login";
+
+        Long obreroId = getUserId(session);
+        try {
+            servicioService.finalizarServicio(id, obreroId);
+            ra.addFlashAttribute("success", "✅ Servicio finalizado.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/obrero/marketplace/servicios";
+    }
+
 }
+
 

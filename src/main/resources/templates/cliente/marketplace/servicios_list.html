@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mis Servicios</title>
+</head>
+<body>
+
+<h2>Mis Servicios</h2>
+
+<p th:if="${success}" th:text="${success}" style="color:green;"></p>
+<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+
+<p>
+    <a href="/cliente/dashboard">⬅ Volver</a>
+    |
+    <a href="/cliente/marketplace/solicitudes">📌 Mis solicitudes</a>
+</p>
+
+<br/>
+
+<p th:if="${#lists.isEmpty(servicios)}">Aún no tienes servicios.</p>
+
+<table th:if="${!#lists.isEmpty(servicios)}" border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Solicitud</th>
+        <th>Obrero</th>
+        <th>Precio</th>
+        <th>Estado</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="s : ${servicios}">
+        <td th:text="${s.id}"></td>
+        <td th:text="${s.solicitudId}"></td>
+        <td th:text="${s.obreroId}"></td>
+        <td th:text="${s.precioAcordado}"></td>
+        <td th:text="${s.estado}"></td>
+        <td th:text="${s.fechaInicio}"></td>
+        <td th:text="${s.fechaFin}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

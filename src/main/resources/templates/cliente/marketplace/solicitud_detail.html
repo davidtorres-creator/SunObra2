@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Detalle Solicitud</title>
+</head>
+<body>
+
+<a href="/cliente/marketplace/solicitudes">← Volver</a>
+
+<h2>Detalle de Solicitud</h2>
+
+<p th:if="${success}" th:text="${success}" style="color:green;"></p>
+<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+
+<hr/>
+
+<p><b>ID:</b> <span th:text="${solicitud.id}"></span></p>
+<p><b>Especialidad:</b> <span th:text="${solicitud.especialidad}"></span></p>
+<p><b>Urgencia:</b> <span th:text="${solicitud.urgencia}"></span></p>
+<p><b>Ubicación:</b> <span th:text="${solicitud.ubicacion}"></span></p>
+<p><b>Estado:</b> <span th:text="${solicitud.estado}"></span></p>
+
+<p><b>Descripción:</b></p>
+<p th:text="${solicitud.descripcion}"></p>
+
+<hr/>
+
+<h3>Cotizaciones recibidas</h3>
+
+<p th:if="${#lists.isEmpty(cotizaciones)}">Aún no hay cotizaciones.</p>
+
+<table th:if="${!#lists.isEmpty(cotizaciones)}" border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Obrero</th>
+        <th>Precio</th>
+        <th>Tiempo (días)</th>
+        <th>Mensaje</th>
+        <th>Estado</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="c : ${cotizaciones}">
+        <td th:text="${c.id}"></td>
+        <td th:text="${c.obreroId}"></td>
+        <td th:text="${c.precio}"></td>
+        <td th:text="${c.tiempoEstimadoDias}"></td>
+        <td th:text="${c.mensaje}"></td>
+        <td th:text="${c.estado}"></td>
+        <td>
+            <form th:if="${solicitud.estado.toString() == 'ABIERTA' and c.estado.toString() == 'ENVIADA'}"
+                  method="post"
+                  th:action="@{'/cliente/marketplace/solicitudes/' + ${solicitud.id} + '/cotizaciones/' + ${c.id} + '/aceptar'}">
+                <button type="submit">Aceptar</button>
+            </form>
+            <span th:if="${!(solicitud.estado.toString() == 'ABIERTA' and c.estado.toString() == 'ENVIADA')}">-</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

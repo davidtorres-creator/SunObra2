@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8" />
     <title>Mis solicitudes</title>
@@ -11,7 +11,12 @@
 <p th:if="${success}" th:text="${success}" style="color:green;"></p>
 <p th:if="${error}" th:text="${error}" style="color:red;"></p>
 
-<a href="/cliente/marketplace/solicitudes/new">+ Nueva solicitud</a>
+<!-- Acciones principales -->
+<p>
+    <a href="/cliente/marketplace/solicitudes/new">+ Nueva solicitud</a>
+    |
+    <a href="/cliente/marketplace/servicios">📋 Mis servicios</a>
+</p>
 
 <table border="1" cellpadding="8" cellspacing="0">
     <thead>
@@ -21,6 +26,7 @@
         <th>Urgencia</th>
         <th>Estado</th>
         <th>Creada</th>
+        <th>Acción</th>
     </tr>
     </thead>
     <tbody>
@@ -30,6 +36,19 @@
         <td th:text="${s.urgencia}">MEDIA</td>
         <td th:text="${s.estado}">ABIERTA</td>
         <td th:text="${s.createdAt}">2026-02-08</td>
+        <td>
+            <!-- Si está ABIERTA: ver detalle / cotizaciones -->
+            <a th:if="${s.estado.toString() == 'ABIERTA'}"
+               th:href="@{'/cliente/marketplace/solicitudes/' + ${s.id}}">
+                Ver / Cotizaciones
+            </a>
+
+            <!-- Si está CERRADA: ir a servicios -->
+            <a th:if="${s.estado.toString() == 'CERRADA'}"
+               href="/cliente/marketplace/servicios">
+                Ver servicio
+            </a>
+        </td>
     </tr>
     </tbody>
 </table>

@@ -10,6 +10,8 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
 
     Optional<Servicio> findBySolicitudId(Long solicitudId);
 
+    Optional<Servicio> findByIdAndObreroId(Long id, Long obreroId);
+
     List<Servicio> findByClienteIdOrderByIdDesc(Long clienteId);
 
     List<Servicio> findByObreroIdOrderByIdDesc(Long obreroId);

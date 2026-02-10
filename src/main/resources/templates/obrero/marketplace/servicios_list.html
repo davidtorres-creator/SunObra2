@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mis Servicios</title>
+</head>
+<body>
+
+<h2>Mis Servicios</h2>
+
+<p th:if="${success}" th:text="${success}" style="color:green;"></p>
+<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+
+<p>
+    <a href="/obrero/dashboard">⬅ Volver</a>
+    |
+    <a href="/obrero/marketplace/solicitudes">📌 Solicitudes</a>
+    |
+    <a href="/obrero/marketplace/cotizaciones">📄 Mis cotizaciones</a>
+</p>
+
+<br/>
+
+<p th:if="${#lists.isEmpty(servicios)}">Aún no tienes servicios asignados.</p>
+
+<table th:if="${!#lists.isEmpty(servicios)}" border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Solicitud</th>
+        <th>Cliente</th>
+        <th>Precio</th>
+        <th>Estado</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="s : ${servicios}">
+        <td th:text="${s.id}"></td>
+        <td th:text="${s.solicitudId}"></td>
+        <td th:text="${s.clienteId}"></td>
+        <td th:text="${s.precioAcordado}"></td>
+        <td th:text="${s.estado}"></td>
+        <td th:text="${s.fechaInicio}"></td>
+        <td th:text="${s.fechaFin}"></td>
+        <td>
+            <!-- Iniciar -->
+            <form th:if="${s.estado.toString() == 'PROGRAMADO'}"
+                  method="post"
+                  th:action="@{'/obrero/marketplace/servicios/' + ${s.id} + '/iniciar'}"
+                  style="display:inline;">
+                <button type="submit">Iniciar</button>
+            </form>
+
+            <!-- Finalizar -->
+            <form th:if="${s.estado.toString() == 'EN_PROCESO'}"
+                  method="post"
+                  th:action="@{'/obrero/marketplace/servicios/' + ${s.id} + '/finalizar'}"
+                  style="display:inline;">
+                <button type="submit">Finalizar</button>
+            </form>
+
+            <span th:if="${s.estado.toString() != 'PROGRAMADO' and s.estado.toString() != 'EN_PROCESO'}">-</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
