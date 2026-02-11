@@ -8,6 +8,9 @@ import com.example.SunObra.marketplace.repository.ReviewRepository;
 import com.example.SunObra.marketplace.repository.ServicioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -23,6 +26,18 @@ public class ReviewService {
     public Review buscarPorServicio(Long servicioId) {
         return reviewRepo.findByServicioId(servicioId).orElse(null);
     }
+
+    public Map<Long, Integer> ratingsPorServicioIds(List<Long> servicioIds) {
+        if (servicioIds == null || servicioIds.isEmpty()) return Map.of();
+
+        return reviewRepo.findByServicioIdIn(servicioIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        Review::getServicioId,
+                        Review::getRating
+                ));
+    }
+
 
     @Transactional
     public void crearReview(Long clienteId, Long servicioId, ReviewCreateRequest req) {

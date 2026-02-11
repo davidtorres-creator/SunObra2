@@ -43,13 +43,21 @@
         <td th:text="${s.estado}"></td>
         <td th:text="${s.fechaInicio}"></td>
         <td th:text="${s.fechaFin}"></td>
+
         <td>
-            <!-- Solo permitir calificar si el servicio está FINALIZADO -->
-            <a th:if="${s.estado.toString() == 'FINALIZADO'}"
+            <!-- Si ya existe review: mostrar "Ya calificado ⭐X" -->
+            <span th:if="${reviewRatings != null and reviewRatings.containsKey(s.id)}">
+                ✅ Ya calificado ⭐<span th:text="${reviewRatings[s.id]}"></span>
+            </span>
+
+            <!-- Si no hay review y está FINALIZADO: mostrar botón Calificar -->
+            <a th:if="${(reviewRatings == null or !reviewRatings.containsKey(s.id)) and s.estado.toString() == 'FINALIZADO'}"
                th:href="@{'/cliente/marketplace/servicios/' + ${s.id} + '/review'}">
                 Calificar
             </a>
-            <span th:if="${s.estado.toString() != 'FINALIZADO'}">-</span>
+
+            <!-- En otros casos -->
+            <span th:if="${(reviewRatings == null or !reviewRatings.containsKey(s.id)) and s.estado.toString() != 'FINALIZADO'}">-</span>
         </td>
     </tr>
     </tbody>

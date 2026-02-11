@@ -120,9 +120,17 @@ public class ClienteMarketplaceController {
         if (!isCliente(session)) return "redirect:/auth/login";
 
         Long clienteId = getUserId(session);
-        model.addAttribute("servicios", servicioService.listarPorCliente(clienteId));
+
+        var servicios = servicioService.listarPorCliente(clienteId);
+        model.addAttribute("servicios", servicios);
+
+        // Mapa: servicioId -> rating (para mostrar "Ya calificado ⭐X")
+        var ids = servicios.stream().map(s -> s.getId()).toList();
+        model.addAttribute("reviewRatings", reviewService.ratingsPorServicioIds(ids));
+
         return "cliente/marketplace/servicios_list";
     }
+
 
     @GetMapping("/servicios/{id}/review")
     public String formReview(HttpSession session, @PathVariable Long id, Model model) {

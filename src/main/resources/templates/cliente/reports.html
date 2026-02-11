@@ -7,104 +7,173 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <a href="/cliente/dashboard" class="btn-volver">
-            <i class="fas fa-arrow-left"></i> Volver
-        </a>
-        <h1>Reportes de Obreros</h1>
-    </nav>
 
-    <main class="container">
-        <!-- Filtros -->
-        <section class="card">
-            <h2><i class="fas fa-filter"></i> Filtros de Búsqueda</h2>
-            <form class="form-grid" method="get">
-                <div class="form-group">
-                    <label>Especialidad</label>
-                    <input name="especialidad" th:value="${especialidad}" placeholder="Ej: Electricidad, Plomería">
-                </div>
-                <div class="form-group">
-                    <label>Experiencia mínima (años)</label>
-                    <input type="number" name="experiencia" th:value="${experiencia}" placeholder="0" min="0">
-                </div>
-                <div class="form-group">
-                    <label>Tarifa mínima ($)</label>
-                    <input type="number" name="tarifaMin" th:value="${tarifaMin}" placeholder="0" min="0" step="1000">
-                </div>
-                <div class="form-group">
-                    <label>Tarifa máxima ($)</label>
-                    <input type="number" name="tarifaMax" th:value="${tarifaMax}" placeholder="0" min="0" step="1000">
-                </div>
-                <div class="form-group full">
-                    <label>Búsqueda libre</label>
-                    <input name="texto" th:value="${texto}" placeholder="Nombre, apellido, email o especialidad">
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-search"></i> Aplicar Filtros
-                    </button>
-                    <a href="/cliente/reports" class="btn-outline">
-                        <i class="fas fa-times"></i> Limpiar
-                    </a>
-                </div>
-            </form>
-        </section>
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="/cliente/dashboard" class="btn-volver">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+    <h1>Reportes de Obreros</h1>
+</nav>
 
-        <!-- Resultados -->
-        <section class="card">
-            <header class="card-header">
-                <h2><i class="fas fa-users"></i> Obreros Disponibles</h2>
-                <span class="badge" th:text="${#lists.size(obreros)} + ' resultados'"></span>
-            </header>
-            <div class="card-body">
-                <!-- Mensaje si no hay resultados -->
-                <div th:if="${#lists.isEmpty(obreros)}" class="no-results">
-                    <i class="fas fa-search fa-3x"></i>
-                    <h3>No se encontraron obreros</h3>
-                    <p>Intenta ajustar los filtros de búsqueda</p>
-                </div>
+<main class="container">
 
-                <!-- Tabla de resultados -->
-                <div th:if="${!#lists.isEmpty(obreros)}" class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Especialidades</th>
-                                <th>Experiencia</th>
-                                <th>Tarifa/Hora</th>
-                                <th>Contacto</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="obrero : ${obreros}">
-                                <td><strong th:text="${obrero.nombre + ' ' + obrero.apellido}"></strong></td>
-                                <td><span th:text="${obrero.especialidades}"></span></td>
-                                <td><span class="badge-info" th:text="${obrero.experiencia} + ' años'"></span></td>
-                                <td><strong th:text="'$' + ${#numbers.formatDecimal(obrero.tarifaHora, 0, 'COMMA', 0, 'POINT')}"></strong></td>
-                                <td>
-                                    <small th:text="${obrero.email}"></small><br>
-                                    <small th:text="${obrero.telefono}"></small>
-                                </td>
-                                <td>
-                                    <button class="btn-sm" th:onclick="'contactarObrero(' + ${obrero.id} + ')'">
-                                        <i class="fas fa-phone"></i> Contactar
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+    <!-- FILTROS -->
+    <section class="card">
+        <h2><i class="fas fa-filter"></i> Filtros de Búsqueda</h2>
+
+        <form class="form-grid" method="get">
+
+            <div class="form-group">
+                <label>Especialidad</label>
+                <input name="especialidad"
+                       th:value="${especialidad}"
+                       placeholder="Ej: Electricidad, Plomería">
             </div>
-        </section>
-    </main>
 
-    <script>
-        function contactarObrero(obreroId) {
-            alert('Función de contacto para obrero ID: ' + obreroId);
-        }
-    </script>
+            <div class="form-group">
+                <label>Experiencia mínima (años)</label>
+                <input type="number"
+                       name="experiencia"
+                       min="0"
+                       th:value="${experiencia}">
+            </div>
+
+            <div class="form-group">
+                <label>Tarifa mínima ($)</label>
+                <input type="number"
+                       name="tarifaMin"
+                       min="0"
+                       step="1000"
+                       th:value="${tarifaMin}">
+            </div>
+
+            <div class="form-group">
+                <label>Tarifa máxima ($)</label>
+                <input type="number"
+                       name="tarifaMax"
+                       min="0"
+                       step="1000"
+                       th:value="${tarifaMax}">
+            </div>
+
+            <div class="form-group full">
+                <label>Búsqueda libre</label>
+                <input name="texto"
+                       th:value="${texto}"
+                       placeholder="Nombre, apellido, email o especialidad">
+            </div>
+
+            <!-- ⭐ ORDENAR POR RANKING -->
+            <div class="form-group full">
+                <label>
+                    <input type="checkbox"
+                           name="ordenarPorRating"
+                           value="true"
+                           th:checked="${ordenarPorRating}">
+                    Ordenar por ranking (mejor calificados primero)
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-search"></i> Aplicar filtros
+                </button>
+                <a href="/cliente/reports" class="btn-outline">
+                    <i class="fas fa-times"></i> Limpiar
+                </a>
+            </div>
+
+        </form>
+    </section>
+
+    <!-- RESULTADOS -->
+    <section class="card">
+        <header class="card-header">
+            <h2><i class="fas fa-users"></i> Obreros Disponibles</h2>
+            <span class="badge"
+                  th:text="${#lists.size(obreros)} + ' resultados'"></span>
+        </header>
+
+        <div class="card-body">
+
+            <!-- SIN RESULTADOS -->
+            <div th:if="${#lists.isEmpty(obreros)}" class="no-results">
+                <i class="fas fa-search fa-3x"></i>
+                <h3>No se encontraron obreros</h3>
+                <p>Intenta ajustar los filtros de búsqueda</p>
+            </div>
+
+            <!-- TABLA -->
+            <div th:if="${!#lists.isEmpty(obreros)}" class="table-container">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Especialidades</th>
+                        <th>Experiencia</th>
+                        <th>Tarifa/Hora</th>
+                        <th>Rating</th>
+                        <th>Contacto</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <tr th:each="obrero : ${obreros}">
+                        <td>
+                            <strong th:text="${obrero.nombre + ' ' + obrero.apellido}"></strong>
+                        </td>
+
+                        <td th:text="${obrero.especialidades}"></td>
+
+                        <td>
+                            <span class="badge-info"
+                                  th:text="${obrero.experiencia} + ' años'"></span>
+                        </td>
+
+                        <td>
+                            <strong th:text="'$' + ${#numbers.formatDecimal(obrero.tarifaHora,0,'COMMA',0,'POINT')}"></strong>
+                        </td>
+
+                        <!-- ⭐ RATING -->
+                        <td>
+                            <span th:if="${ratingMap.containsKey(obrero.id)}">
+                                ⭐ <span th:text="${#numbers.formatDecimal(ratingMap[obrero.id].avgRating,1,1)}"></span>
+                                (<span th:text="${ratingMap[obrero.id].total}"></span>)
+                            </span>
+                            <span th:if="${!ratingMap.containsKey(obrero.id)}">
+                                Sin reviews
+                            </span>
+                        </td>
+
+                        <td>
+                            <small th:text="${obrero.email}"></small><br>
+                            <small th:text="${obrero.telefono}"></small>
+                        </td>
+
+                        <td>
+                            <button class="btn-sm"
+                                    th:onclick="'contactarObrero(' + ${obrero.id} + ')'">
+                                <i class="fas fa-phone"></i> Contactar
+                            </button>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+<script>
+    function contactarObrero(obreroId) {
+        alert('Función de contacto para obrero ID: ' + obreroId);
+    }
+</script>
+
 </body>
 </html>
