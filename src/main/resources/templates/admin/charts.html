@@ -13,35 +13,40 @@
 <h1>Gráficos del Sistema</h1>
 
 <div class="charts-grid">
+
+    <!-- =========================
+         USUARIOS POR ROL
+    ========================== -->
     <section>
         <span class="info-badge">📊 Estadísticas en tiempo real</span>
         <h2>Usuarios por Rol</h2>
-        <!-- El src apunta al endpoint que genera la imagen -->
+
         <img th:src="@{/admin/charts/roles}" alt="Usuarios por rol"/>
-        <!-- Enlace para exportar a PDF -->
         <a th:href="@{/admin/charts/roles/pdf}" class="btn">Descargar PDF</a>
     </section>
 
-    <!-- Agregar más secciones para otros gráficos -->
-
-    <!-- Ejemplo de otra sección -->
-    <!--
+    <!-- =========================
+         SOLICITUDES POR ESTADO
+    ========================== -->
     <section>
-        <span class="info-badge">📈 Análisis mensual</span>
-        <h2>Ventas del Mes</h2>
-        <img th:src="@{/admin/charts/ventas}" alt="Ventas mensuales"/>
-        <a th:href="@{/admin/charts/ventas/pdf}" class="btn">Descargar PDF</a>
-    </section>
-    -->
+        <span class="info-badge">🧾 Marketplace</span>
+        <h2>Solicitudes por Estado</h2>
 
-    <!--
-    <section>
-        <span class="info-badge">👥 Actividad de usuarios</span>
-        <h2>Usuarios Activos</h2>
-        <img th:src="@{/admin/charts/activos}" alt="Usuarios activos"/>
-        <a th:href="@{/admin/charts/activos/pdf}" class="btn">Descargar PDF</a>
+        <img th:src="@{/admin/charts/solicitudes}" alt="Solicitudes por estado"/>
+        <a th:href="@{/admin/charts/solicitudes/pdf}" class="btn">Descargar PDF</a>
     </section>
-    -->
+
+    <!-- =========================
+         SERVICIOS POR ESTADO
+    ========================== -->
+    <section>
+        <span class="info-badge">🛠 Seguimiento</span>
+        <h2>Servicios por Estado</h2>
+
+        <img th:src="@{/admin/charts/servicios}" alt="Servicios por estado"/>
+        <a th:href="@{/admin/charts/servicios/pdf}" class="btn">Descargar PDF</a>
+    </section>
+
 </div>
 
 </body>

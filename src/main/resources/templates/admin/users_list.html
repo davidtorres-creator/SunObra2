@@ -21,26 +21,51 @@
         </div>
     </div>
 
-    <form class="filter-form" method="get">
+    <!-- ✅ Filtros por rol + búsqueda (usa ?role= y ?q=) -->
+    <form class="filter-form" th:action="@{/admin/users}" method="get">
         <select name="role">
-            <option value="">Todos</option>
-            <option value="admin" th:selected="${filterRole}=='admin'">Admin</option>
-            <option value="cliente" th:selected="${filterRole}=='cliente'">Cliente</option>
-            <option value="obrero" th:selected="${filterRole}=='obrero'">Obrero</option>
+            <option value="" th:selected="${filterRole == null || filterRole == ''}">Todos</option>
+
+            <option value="admin"
+                    th:selected="${filterRole != null && filterRole.toLowerCase() == 'admin'}">
+                Admin
+            </option>
+
+            <option value="cliente"
+                    th:selected="${filterRole != null && filterRole.toLowerCase() == 'cliente'}">
+                Cliente
+            </option>
+
+            <option value="obrero"
+                    th:selected="${filterRole != null && filterRole.toLowerCase() == 'obrero'}">
+                Obrero
+            </option>
         </select>
 
-        <input type="search" name="q" placeholder="Buscar..." th:value="${q}">
+        <input type="search" name="q" placeholder="Buscar por nombre, apellido o email..." th:value="${q}">
         <button type="submit" class="btn btn-secondary">Filtrar</button>
+
+        <!-- ✅ NUEVO: limpiar filtros -->
+        <a class="btn btn-outline-secondary" th:href="@{/admin/users}">Limpiar</a>
 
         <!-- Exportar (respeta los filtros actuales) -->
         <div class="export-group">
             <span>Exportar:</span>
+
             <a class="btn btn-light"
-               th:href="@{/admin/reports/export/html(role=${filterRole}, texto=${q})}">HTML</a>
+               th:href="@{/admin/reports/export/html(role=${filterRole}, texto=${q})}">
+                HTML
+            </a>
+
             <a class="btn btn-light"
-               th:href="@{/admin/reports/export/csv(role=${filterRole}, texto=${q})}">CSV</a>
+               th:href="@{/admin/reports/export/csv(role=${filterRole}, texto=${q})}">
+                CSV
+            </a>
+
             <a class="btn btn-light"
-               th:href="@{/admin/reports/export/txt(role=${filterRole}, texto=${q})}">TXT</a>
+               th:href="@{/admin/reports/export/txt(role=${filterRole}, texto=${q})}">
+                TXT
+            </a>
         </div>
     </form>
 
@@ -57,7 +82,7 @@
         <tbody>
         <tr th:each="u : ${usuarios}">
             <td th:text="${u.id}">1</td>
-            <td th:text="${u.nombre + ' ' + u.apellido}">Nombre Apellido</td>
+            <td th:text="${(u.nombre ?: '') + ' ' + (u.apellido ?: '')}">Nombre Apellido</td>
             <td th:text="${u.email}">correo@ejemplo.com</td>
             <td th:text="${u.userType}">cliente</td>
             <td>
@@ -68,6 +93,7 @@
                 </form>
             </td>
         </tr>
+
         <tr th:if="${#lists.isEmpty(usuarios)}">
             <td colspan="5" style="text-align:center; padding:16px;">No hay usuarios para mostrar.</td>
         </tr>

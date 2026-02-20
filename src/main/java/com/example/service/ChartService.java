@@ -74,6 +74,88 @@ public class ChartService {
         );
 
         // 5) Estilo: fondo blanco, grilla suave, eje Y en enteros, etiquetas visibles
+        applyDefaultBarStyle(chart);
+
+        return chart;
+    }
+
+    /* =======================
+         GRÁFICO: SOLICITUDES POR ESTADO
+       ======================= */
+    /**
+     * Genera un gráfico de barras con el número de solicitudes por estado.
+     *
+     * @param abiertas   número de solicitudes ABIERTA
+     * @param cerradas   número de solicitudes CERRADA
+     * @param canceladas número de solicitudes CANCELADA
+     */
+    public JFreeChart createSolicitudStatusChart(long abiertas, long cerradas, long canceladas) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(abiertas, "Solicitudes", "Abiertas");
+        dataset.addValue(cerradas, "Solicitudes", "Cerradas");
+        dataset.addValue(canceladas, "Solicitudes", "Canceladas");
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Solicitudes por Estado",
+                "Estado",
+                "Cantidad",
+                dataset,
+                PlotOrientation.VERTICAL,
+                false,
+                true,
+                false
+        );
+
+        // Aplica el mismo estilo que el gráfico de roles
+        applyDefaultBarStyle(chart);
+
+        return chart;
+    }
+
+    /* =======================
+         GRÁFICO: SERVICIOS POR ESTADO
+       ======================= */
+    /**
+     * Genera un gráfico de barras con el número de servicios por estado.
+     *
+     * @param programados número de servicios PROGRAMADO
+     * @param enProceso   número de servicios EN_PROCESO
+     * @param finalizados número de servicios FINALIZADO
+     * @param cancelados  número de servicios CANCELADO
+     */
+    public JFreeChart createServicioStatusChart(long programados, long enProceso,
+                                                long finalizados, long cancelados) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(programados, "Servicios", "Programados");
+        dataset.addValue(enProceso, "Servicios", "En proceso");
+        dataset.addValue(finalizados, "Servicios", "Finalizados");
+        dataset.addValue(cancelados, "Servicios", "Cancelados");
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Servicios por Estado",
+                "Estado",
+                "Cantidad",
+                dataset,
+                PlotOrientation.VERTICAL,
+                false,
+                true,
+                false
+        );
+
+        // Aplica el mismo estilo que el gráfico de roles
+        applyDefaultBarStyle(chart);
+
+        return chart;
+    }
+
+    // =======================
+    // ESTILO REUTILIZABLE
+    // =======================
+    /**
+     * Aplica el mismo estilo visual usado en el gráfico de roles:
+     * fondo blanco, grilla suave, etiquetas visibles, eje Y entero y color corporativo.
+     */
+    private void applyDefaultBarStyle(JFreeChart chart) {
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
         plot.setBackgroundPaint(Color.WHITE);
         plot.setOutlineVisible(false);
@@ -92,8 +174,6 @@ public class ChartService {
         r.setShadowVisible(false);
         // Color corporativo #eac72c
         r.setSeriesPaint(0, new Color(0xEA, 0xC7, 0x2C));
-
-        return chart;
     }
 
     private String normalizeRole(String raw) {

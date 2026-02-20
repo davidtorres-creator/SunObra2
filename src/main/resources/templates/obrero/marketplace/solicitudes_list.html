@@ -2,47 +2,114 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Solicitudes disponibles</title>
+
+    <link rel="stylesheet" th:href="@{/css/solicitudes_list.css}" />
 </head>
 <body>
 
-<h2>Solicitudes disponibles (ABIERTAS)</h2>
+<!-- Topbar (patrón como tu imagen) -->
+<header class="topbar">
+    <div class="topbar__left">
+        <a class="brand" href="/obrero/dashboard">
+            <span class="brand__name">SunObra</span><span class="brand__role">-Obreo</span>
+        </a>
+    </div>
 
-<!-- Acciones principales del obrero -->
-<p>
-    <a href="/obrero/dashboard">⬅ Volver al dashboard</a>
-    |
-    <a href="/obrero/marketplace/cotizaciones">📄 Mis cotizaciones</a>
-    |
-    <a href="/obrero/marketplace/servicios">🛠 Mis servicios</a>
-</p>
+    <nav class="topbar__nav">
+        <a class="topbar__link" href="/obrero/dashboard">Inicio</a>
+        <a class="topbar__link" href="/obrero/perfil">Perfil</a>
+        <a class="topbar__link" href="/obrero/reportes">Reportes</a>
+    </nav>
 
-<table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Especialidad</th>
-        <th>Urgencia</th>
-        <th>Ubicación</th>
-        <th>Creada</th>
-        <th>Acción</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="s : ${solicitudes}">
-        <td th:text="${s.id}">1</td>
-        <td th:text="${s.especialidad}">Electricidad</td>
-        <td th:text="${s.urgencia}">MEDIA</td>
-        <td th:text="${s.ubicacion}">Bogotá</td>
-        <td th:text="${s.createdAt}">2026-02-08</td>
-        <td>
-            <a th:href="@{'/obrero/marketplace/solicitudes/' + ${s.id}}">
-                Ver / Cotizar
-            </a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <div class="topbar__right">
+        <a class="btn btn--yellow" href="/logout">Cerrar Sesión</a>
+    </div>
+</header>
+
+<main class="page">
+    <section class="container">
+
+        <div class="page-header">
+            <h1 class="page-title">Solicitudes disponibles</h1>
+            <p class="page-subtitle">Estado: <span class="badge badge--open">ABIERTAS</span></p>
+        </div>
+
+        <!-- Acciones tipo botones (como en tu dashboard) -->
+        <div class="actions">
+            <a class="btn btn--ghost" href="/obrero/dashboard">⬅ Volver</a>
+            <a class="btn btn--dark" href="/obrero/marketplace/cotizaciones">📄 Mis cotizaciones</a>
+            <a class="btn btn--orange" href="/obrero/marketplace/servicios">🛠 Mis servicios</a>
+        </div>
+
+        <!-- Card contenedor (tabla con estilo) -->
+        <div class="card">
+            <div class="card__header">
+                <h2 class="card__title">Listado</h2>
+                <p class="card__hint">Selecciona una solicitud para ver detalles y cotizar.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Especialidad</th>
+                        <th>Urgencia</th>
+                        <th>Ubicación</th>
+                        <th>Creada</th>
+                        <th>Acción</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(solicitudes)}">
+                        <td colspan="6" class="empty">
+                            No hay solicitudes abiertas en este momento.
+                        </td>
+                    </tr>
+
+                    <tr th:each="s : ${solicitudes}">
+                        <td data-label="ID" th:text="${s.id}">1</td>
+
+                        <td data-label="Especialidad" th:text="${s.especialidad}">
+                            Electricidad
+                        </td>
+
+                        <td data-label="Urgencia">
+                            <span class="urgency"
+                                  th:text="${s.urgencia}"
+                                  th:classappend="
+                                    ${s.urgencia} == 'ALTA' ? ' urgency--high' :
+                                    (${s.urgencia} == 'MEDIA' ? ' urgency--mid' : ' urgency--low')
+                                  ">
+                                MEDIA
+                            </span>
+                        </td>
+
+                        <td data-label="Ubicación" th:text="${s.ubicacion}">Bogotá</td>
+
+                        <td data-label="Creada" th:text="${s.createdAt}">2026-02-08</td>
+
+                        <td data-label="Acción">
+                            <a class="btn btn--sm btn--orange"
+                               th:href="@{'/obrero/marketplace/solicitudes/' + ${s.id}}">
+                                Ver / Cotizar
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="footer__inner">© 2025 SunObra - Plataforma de Servicios de Construcción</div>
+</footer>
 
 </body>
 </html>

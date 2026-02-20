@@ -135,8 +135,10 @@ public class UsuarioService {
      * Importa usuarios desde un archivo CSV/XLS/XLSX.
      * Encabezados esperados (en cualquier orden):
      * nombre, apellido, email, userType, especialidades, experiencia, telefono, direccion, password
+     *
+     * ✅ Ahora retorna ImportResult (insertados + duplicados)
      */
-    public int importarUsuarios(MultipartFile file) throws Exception {
+    public ImportResult importarUsuarios(MultipartFile file) throws Exception {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("Debe adjuntar un archivo");
         }
@@ -157,8 +159,9 @@ public class UsuarioService {
     }
 
     // ------- CSV (mapeo por encabezado) -------
-    private int importarDesdeCsv(MultipartFile file) throws Exception {
-        int count = 0;
+    private ImportResult importarDesdeCsv(MultipartFile file) throws Exception {
+        int inserted = 0;
+        List<String> duplicates = new ArrayList<>();
 
         try (InputStream in = file.getInputStream();
              BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
@@ -200,11 +203,15 @@ public class UsuarioService {
 
                 if (u.getEmail() != null && !emailExiste(u.getEmail())) {
                     registrarUsuario(u);
-                    count++;
+                    inserted++;
+                } else if (u.getEmail() != null) {
+                    // ✅ Duplicado
+                    duplicates.add(u.getEmail());
                 }
             }
         }
-        return count;
+
+        return new ImportResult(inserted, duplicates);
     }
 
     private String getByName(String[] row, Map<String,Integer> idx, String name) {
@@ -217,8 +224,9 @@ public class UsuarioService {
     private String safe(String s) { return s == null ? "" : s.trim(); }
 
     // ------- Excel (XLS/XLSX) con encabezado -------
-    private int importarDesdeExcel(MultipartFile file) throws Exception {
-        int count = 0;
+    private ImportResult importarDesdeExcel(MultipartFile file) throws Exception {
+        int inserted = 0;
+        List<String> duplicates = new ArrayList<>();
         DataFormatter fmt = new DataFormatter(Locale.ROOT);
 
         try (InputStream in = file.getInputStream();
@@ -266,11 +274,14 @@ public class UsuarioService {
 
                 if (u.getEmail() != null && !emailExiste(u.getEmail())) {
                     registrarUsuario(u);
-                    count++;
+                    inserted++;
+                } else if (u.getEmail() != null) {
+                    duplicates.add(u.getEmail());
                 }
             }
         }
-        return count;
+
+        return new ImportResult(inserted, duplicates);
     }
 
     private String cellByName(Row row, Map<String,Integer> idx, String name, DataFormatter fmt) {

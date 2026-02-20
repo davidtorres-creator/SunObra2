@@ -16,8 +16,11 @@
             <li><a href="/admin/reports">Reportes</a></li>
             <li><a href="/admin/email/form">Enviar mensaje</a></li>
 
-            <!-- 🔵 NUEVO: acceso al módulo de gráficos -->
+            <!-- 🔵 Acceso al módulo de gráficos -->
             <li><a href="/admin/charts">Gráficos</a></li>
+
+            <!-- ✅ NUEVO: Health (Actuator) -->
+            <li><a href="/admin/health">Health</a></li>
         </ul>
         <a class="btn-logout" href="/logout">Cerrar sesión</a>
     </div>
@@ -32,6 +35,7 @@
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
     <div class="cards">
+
         <!-- Card Usuarios -->
         <div class="card card-blue">
             <h5>Total Usuarios</h5>
@@ -39,11 +43,36 @@
             <a href="/admin/users" class="btn-card">Gestionar</a>
         </div>
 
-        <!-- Card Reportes -->
+        <!-- ✅ NUEVO: Solicitudes Abiertas -->
         <div class="card card-yellow">
+            <h5>Solicitudes Abiertas</h5>
+            <div class="card-value" th:text="${solicitudesAbiertas}">0</div>
+            <p class="card-subtitle">Solicitudes pendientes/disponibles</p>
+            <a href="/admin/charts" class="btn-card dark">Ver gráfico</a>
+        </div>
+
+        <!-- ✅ NUEVO: Servicios en Proceso -->
+        <div class="card card-green">
+            <h5>Servicios en Proceso</h5>
+            <div class="card-value" th:text="${serviciosEnProceso}">0</div>
+            <p class="card-subtitle">Servicios activos actualmente</p>
+            <a href="/admin/charts" class="btn-card">Ver gráfico</a>
+        </div>
+
+        <!-- ✅ NUEVO: Total Reviews -->
+        <div class="card card-purple">
+            <h5>Total Reviews</h5>
+            <div class="card-value" th:text="${totalReviews}">0</div>
+            <p class="card-subtitle">Calificaciones registradas</p>
+            <a href="/admin/charts" class="btn-card">Ver gráficos</a>
+        </div>
+
+        <!-- Card Reportes -->
+        <div class="card card-blue">
             <h5>Reportes Avanzados</h5>
+            <!-- Tu variable original se deja para no romper nada -->
             <div class="card-value" th:text="${contratosActivos}">0</div>
-            <a href="/admin/reports" class="btn-card dark">Ver</a>
+            <a href="/admin/reports" class="btn-card">Ver</a>
         </div>
 
         <!-- Card Envío de Correos -->
@@ -53,11 +82,28 @@
             <a href="/admin/email/form" class="btn-card">Enviar mensaje</a>
         </div>
 
-        <!-- 🟣 NUEVA CARD: Gráficos -->
+        <!-- 🟣 Gráficos -->
         <div class="card card-purple">
             <h5>Gráficos / Estadísticas</h5>
             <p class="card-subtitle">Ver datos visuales</p>
             <a href="/admin/charts" class="btn-card">Ver gráficos</a>
+        </div>
+
+        <!-- ✅ NUEVO: ALERTAS -->
+        <div class="card card-yellow">
+            <h5>Alertas del Sistema</h5>
+
+            <p class="card-subtitle">
+                Solicitudes pendientes (+30 días):
+                <strong th:text="${alertSolicitudes}">0</strong>
+            </p>
+
+            <p class="card-subtitle">
+                Servicios demorados (+60 días):
+                <strong th:text="${alertServicios}">0</strong>
+            </p>
+
+            <a href="/admin/charts" class="btn-card dark">Revisar</a>
         </div>
 
     </div>

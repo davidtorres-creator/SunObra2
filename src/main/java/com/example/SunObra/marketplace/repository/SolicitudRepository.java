@@ -15,6 +15,15 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
     // Para evitar que un cliente vea solicitudes de otro
     Optional<Solicitud> findByIdAndClienteId(Long id, Long clienteId);
 
-    // NUEVO: solicitudes abiertas para marketplace obrero
+    // Solicitudes abiertas para marketplace obrero
     List<Solicitud> findByEstadoOrderByIdDesc(SolicitudStatus estado);
+
+    /**
+     * Cuenta el número de solicitudes por estado.
+     * @param estado estado a contar.
+     * @return cantidad de solicitudes con ese estado.
+     */
+    long countByEstado(SolicitudStatus estado);
+
 }
+

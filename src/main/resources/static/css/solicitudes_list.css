@@ -1,0 +1,259 @@
+/* ====== Base ====== */
+:root{
+  --bg: #f3f4f6;
+  --text: #111827;
+  --muted: #6b7280;
+
+  --dark: #1f2937;     /* barra superior */
+  --dark-2: #111827;
+
+  --orange: #f57c00;   /* acento principal (botones) */
+  --yellow: #f6c000;   /* botón cerrar sesión */
+
+  --card: #ffffff;
+  --border: #e5e7eb;
+
+  --shadow: 0 12px 30px rgba(17, 24, 39, 0.12);
+  --radius: 16px;
+}
+
+*{ box-sizing: border-box; }
+
+html, body{
+  height: 100%;
+}
+
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ====== Topbar ====== */
+.topbar{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  background: var(--dark);
+  color: #fff;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 24px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.brand{
+  text-decoration: none;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.brand__name{
+  color: var(--yellow);
+  font-size: 22px;
+}
+
+.brand__role{
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.topbar__nav{
+  display: flex;
+  gap: 26px;
+}
+
+.topbar__link{
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 0.95;
+  padding: 10px 8px;
+  border-radius: 10px;
+}
+
+.topbar__link:hover{
+  background: rgba(255,255,255,0.08);
+}
+
+/* ====== Layout ====== */
+.page{
+  min-height: calc(100vh - 64px - 52px);
+  padding: 32px 16px 40px;
+}
+
+.container{
+  width: min(1100px, 100%);
+  margin: 0 auto;
+}
+
+.page-header{
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.page-title{
+  margin: 8px 0 6px;
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 900;
+}
+
+.page-subtitle{
+  margin: 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ====== Badges ====== */
+.badge{
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+.badge--open{
+  border-color: rgba(245, 124, 0, 0.35);
+  color: #a14f00;
+  background: rgba(245, 124, 0, 0.10);
+}
+
+/* ====== Buttons ====== */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  text-decoration: none;
+  cursor: pointer;
+
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-weight: 800;
+  border: 1px solid transparent;
+
+  transition: transform .08s ease, filter .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.btn:active{
+  transform: translateY(1px);
+}
+
+.btn--sm{
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-weight: 800;
+}
+
+.btn--orange{
+  background: var(--orange);
+  color: #fff;
+  box-shadow: 0 10px 18px rgba(245, 124, 0, 0.24);
+}
+
+.btn--orange:hover{
+  filter: brightness(0.98);
+}
+
+.btn--dark{
+  background: var(--dark-2);
+  color: #fff;
+  box-shadow: 0 10px 18px rgba(17, 24, 39, 0.18);
+}
+
+.btn--dark:hover{
+  filter: brightness(1.05);
+}
+
+.btn--yellow{
+  background: var(--yellow);
+  color: #0b0f19;
+  border-color: rgba(0,0,0,0.08);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 900;
+}
+
+.btn--yellow:hover{
+  filter: brightness(0.98);
+}
+
+.btn--ghost{
+  background: #fff;
+  color: var(--dark-2);
+  border-color: var(--border);
+}
+
+.btn--ghost:hover{
+  background: #fafafa;
+}
+
+/* ====== Actions row ====== */
+.actions{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin: 18px 0 18px;
+}
+
+/* ====== Card ====== */
+.card{
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(229, 231, 235, 0.75);
+  overflow: hidden;
+}
+
+.card__header{
+  padding: 18px 18px 10px;
+}
+
+.card__title{
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.card__hint{
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ====== Table ====== */
+.table-wrap{
+  width: 100%;
+  overflow-x: auto;
+  padding: 0 12px 14px;
+}
+
+.table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 760px;
+}
+
+.table thead th{
+  text-align: left;
+  font-size: 13px;
+  c

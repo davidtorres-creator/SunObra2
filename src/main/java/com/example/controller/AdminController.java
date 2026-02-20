@@ -1,6 +1,13 @@
 package com.example.controller;
 
+import com.example.SunObra.marketplace.enums.ServicioStatus;
+import com.example.SunObra.marketplace.enums.SolicitudStatus;
+import com.example.SunObra.marketplace.repository.ReviewRepository;
+import com.example.SunObra.marketplace.repository.ServicioRepository;
+import com.example.SunObra.marketplace.repository.SolicitudRepository;
 import com.example.model.usuarios;
+import com.example.service.AdminAlertService;
+import com.example.service.ImportResult;
 import com.example.service.ReportService;
 import com.example.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
@@ -26,6 +33,9 @@ import java.util.stream.Collectors;
  * Controlador para las funcionalidades administrativas.
  *
  * Incluye CRUD de usuarios, reportes y carga masiva desde CSV/Excel.
+ * + Dashboard con métricas marketplace (solicitudes, servicios, reviews)
+ * + Alertas simples (AdminAlertService)
+ * + Endpoint de salud (Actuator)
  */
 @Controller
 @RequestMapping("/admin")
@@ -36,6 +46,18 @@ public class AdminController {
 
     @Autowired
     private ReportService reportService;
+
+    @Autowired
+    private SolicitudRepository solicitudRepository;
+
+    @Autowired
+    private ServicioRepository servicioRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private AdminAlertService adminAlertService;
 
     private boolean hasRole(HttpSession session, String role) {
         Object r = session.getAttribute("user_role");
@@ -53,6 +75,34 @@ public class AdminController {
         model.addAttribute("title", "Panel de Administración");
         model.addAttribute("totalUsuarios", usuarioService.listarUsuarios().size());
         model.addAttribute("fecha", LocalDateTime.now());
+
+        // Métricas de solicitudes
+        long solicitudesAbiertas = solicitudRepository.countByEstado(SolicitudStatus.ABIERTA);
+        long solicitudesCerradas = solicitudRepository.countByEstado(SolicitudStatus.CERRADA);
+        long solicitudesCanceladas = solicitudRepository.countByEstado(SolicitudStatus.CANCELADA);
+
+        // Métricas de servicios
+        long serviciosProgramados = servicioRepository.countByEstado(ServicioStatus.PROGRAMADO);
+        long serviciosEnProceso = servicioRepository.countByEstado(ServicioStatus.EN_PROCESO);
+        long serviciosFinalizados = servicioRepository.countByEstado(ServicioStatus.FINALIZADO);
+        long serviciosCancelados = servicioRepository.countByEstado(ServicioStatus.CANCELADO);
+
+        long totalReviews = reviewRepository.count();
+
+        model.addAttribute("solicitudesAbiertas", solicitudesAbiertas);
+        model.addAttribute("solicitudesCerradas", solicitudesCerradas);
+        model.addAttribute("solicitudesCanceladas", solicitudesCanceladas);
+        model.addAttribute("serviciosProgramados", serviciosProgramados);
+        model.addAttribute("serviciosEnProceso", serviciosEnProceso);
+        model.addAttribute("serviciosFinalizados", serviciosFinalizados);
+        model.addAttribute("serviciosCancelados", serviciosCancelados);
+        model.addAttribute("totalReviews", totalReviews);
+
+        // Alertas
+        Map<String, List<?>> alerts = adminAlertService.getAlerts();
+        model.addAttribute("alertSolicitudes", alerts.getOrDefault("solicitudes", Collections.emptyList()).size());
+        model.addAttribute("alertServicios", alerts.getOrDefault("servicios", Collections.emptyList()).size());
+
         return "admin/dashboard";
     }
 
@@ -166,9 +216,14 @@ public class AdminController {
                               RedirectAttributes ra) {
         if (!hasRole(session, "admin")) return "redirect:/auth/login";
         try {
-            int inserted = usuarioService.importarUsuarios(file);
-            ra.addFlashAttribute("success",
-                    "Importación completada. Registros nuevos: " + inserted);
+            ImportResult result = usuarioService.importarUsuarios(file);
+
+            String msg = "Importación completada. Registros nuevos: " + result.getInserted();
+            if (!result.getDuplicates().isEmpty()) {
+                msg += ". Duplicados: " + result.getDuplicates();
+            }
+            ra.addFlashAttribute("success", msg);
+
         } catch (Exception e) {
             ra.addFlashAttribute("error", "No se pudo importar: " + e.getMessage());
         }
@@ -316,5 +371,17 @@ public class AdminController {
                     .collect(Collectors.toList());
         }
         return data;
+    }
+
+    // =======================
+    // ACTUATOR / HEALTH
+    // =======================
+    /** Endpoint para ver salud de la aplicación (usa Actuator) */
+    @GetMapping("/health")
+    public String health(HttpSession session) {
+        if (!hasRole(session, "admin")) {
+            return "redirect:/auth/login";
+        }
+        return "forward:/actuator/health";
     }
 }

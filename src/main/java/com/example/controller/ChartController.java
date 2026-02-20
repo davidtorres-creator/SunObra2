@@ -1,5 +1,9 @@
 package com.example.controller;
 
+import com.example.SunObra.marketplace.enums.ServicioStatus;
+import com.example.SunObra.marketplace.enums.SolicitudStatus;
+import com.example.SunObra.marketplace.repository.ServicioRepository;
+import com.example.SunObra.marketplace.repository.SolicitudRepository;
 import com.example.model.usuarios;
 import com.example.service.ChartService;
 import com.example.service.UsuarioService;
@@ -27,6 +31,13 @@ public class ChartController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    // ✅ NUEVO: repositorios para contar estados de marketplace
+    @Autowired
+    private SolicitudRepository solicitudRepository;
+
+    @Autowired
+    private ServicioRepository servicioRepository;
 
     /** Verifica rol del usuario */
     private boolean hasRole(HttpSession session, String role) {
@@ -79,6 +90,90 @@ public class ChartController {
         response.setContentType("application/pdf");
         chartService.writeChartToPdf(
                 chartService.createRoleChart(usuarios),
+                response.getOutputStream()
+        );
+    }
+
+    // ============================================================
+    //         GRÁFICO PNG: SOLICITUDES POR ESTADO
+    // ============================================================
+    @GetMapping(value = "/solicitudes", produces = MediaType.IMAGE_PNG_VALUE)
+    @ResponseBody
+    public byte[] solicitudesChart(HttpSession session) throws Exception {
+        if (!hasRole(session, "admin")) {
+            return new byte[0];
+        }
+
+        long abiertas   = solicitudRepository.countByEstado(SolicitudStatus.ABIERTA);
+        long cerradas   = solicitudRepository.countByEstado(SolicitudStatus.CERRADA);
+        long canceladas = solicitudRepository.countByEstado(SolicitudStatus.CANCELADA);
+
+        return chartService.toPng(
+                chartService.createSolicitudStatusChart(abiertas, cerradas, canceladas),
+                900, 450
+        );
+    }
+
+    // ============================================================
+    //         GRÁFICO PDF: SOLICITUDES POR ESTADO
+    // ============================================================
+    @GetMapping(value = "/solicitudes/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public void solicitudesChartPdf(HttpSession session, HttpServletResponse response) throws Exception {
+        if (!hasRole(session, "admin")) {
+            response.sendRedirect("/auth/login");
+            return;
+        }
+
+        long abiertas   = solicitudRepository.countByEstado(SolicitudStatus.ABIERTA);
+        long cerradas   = solicitudRepository.countByEstado(SolicitudStatus.CERRADA);
+        long canceladas = solicitudRepository.countByEstado(SolicitudStatus.CANCELADA);
+
+        response.setContentType("application/pdf");
+        chartService.writeChartToPdf(
+                chartService.createSolicitudStatusChart(abiertas, cerradas, canceladas),
+                response.getOutputStream()
+        );
+    }
+
+    // ============================================================
+    //         GRÁFICO PNG: SERVICIOS POR ESTADO
+    // ============================================================
+    @GetMapping(value = "/servicios", produces = MediaType.IMAGE_PNG_VALUE)
+    @ResponseBody
+    public byte[] serviciosChart(HttpSession session) throws Exception {
+        if (!hasRole(session, "admin")) {
+            return new byte[0];
+        }
+
+        long programados = servicioRepository.countByEstado(ServicioStatus.PROGRAMADO);
+        long enProceso   = servicioRepository.countByEstado(ServicioStatus.EN_PROCESO);
+        long finalizados = servicioRepository.countByEstado(ServicioStatus.FINALIZADO);
+        long cancelados  = servicioRepository.countByEstado(ServicioStatus.CANCELADO);
+
+        return chartService.toPng(
+                chartService.createServicioStatusChart(programados, enProceso, finalizados, cancelados),
+                900, 450
+        );
+    }
+
+    // ============================================================
+    //         GRÁFICO PDF: SERVICIOS POR ESTADO
+    // ============================================================
+    @GetMapping(value = "/servicios/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public void serviciosChartPdf(HttpSession session, HttpServletResponse response) throws Exception {
+        if (!hasRole(session, "admin")) {
+            response.sendRedirect("/auth/login");
+            return;
+        }
+
+        long programados = servicioRepository.countByEstado(ServicioStatus.PROGRAMADO);
+        long enProceso   = servicioRepository.countByEstado(ServicioStatus.EN_PROCESO);
+        long finalizados = servicioRepository.countByEstado(ServicioStatus.FINALIZADO);
+        long cancelados  = servicioRepository.countByEstado(ServicioStatus.CANCELADO);
+
+        response.setContentType("application/pdf");
+        chartService.writeChartToPdf(
+                chartService.createServicioStatusChart(programados, enProceso, finalizados, cancelados),
                 response.getOutputStream()
         );
     }

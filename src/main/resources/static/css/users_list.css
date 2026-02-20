@@ -151,3 +151,87 @@ body {
 .btn-back:hover {
   background: #222;
 }
+
+/* ===== Flash messages (alertas) ===== */
+.alert {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0px 3px 10px rgba(0,0,0,0.06);
+}
+.alert-success {
+  background: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  color: #1b5e20;
+}
+.alert-danger {
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  color: #b71c1c;
+}
+
+/* ===== Formulario filtros: mejor layout ===== */
+.filter-form {
+  flex-wrap: wrap;              /* ✅ evita desbordes */
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Inputs adaptables (tu padding actual es enorme) */
+.filter-form select,
+.filter-form input {
+  padding: 10px 14px;           /* ✅ mejor UX */
+  min-width: 220px;
+}
+
+/* Grupo exportar alineado a la derecha */
+.export-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;            /* ✅ empuja export a la derecha */
+  flex-wrap: wrap;
+}
+.export-group span {
+  font-weight: 700;
+  color: #ff7b00;
+}
+
+/* ===== Botón faltante: outline-secondary ===== */
+.btn-outline-secondary {
+  background: #fff;
+  border: 2px solid #ff9100;
+  color: #ff9100;
+}
+.btn-outline-secondary:hover {
+  background: #ff9100;
+  color: #fff;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  body { padding: 16px; }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .filter-form {
+    gap: 12px;
+  }
+  .filter-form select,
+  .filter-form input {
+    width: 100%;
+    min-width: 100%;
+  }
+  .export-group {
+    width: 100%;
+    margin-left: 0;
+  }
+}
